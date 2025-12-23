@@ -28,6 +28,8 @@
 #include <framework/graphics/atlas.h>
 #include <framework/util/crypt.h>
 #include <framework/util/pngunpacker.h>
+#include <framework/graphics/xbrz.h>
+#include <framework/graphics/upscaler.h>
 
 SpriteManager g_sprites;
 
@@ -314,7 +316,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
 bool SpriteManager::loadCasualSpr(std::string file)
 {
-    m_spriteSize = 32u;
+    m_spriteSize = 64u;
     try {
         file = g_resources.guessFilePath(file, "spr");
 
@@ -383,8 +385,6 @@ bool SpriteManager::loadCwmSpr(std::string file)
 ImagePtr SpriteManager::getSpriteImageCasual(int id)
 {
     try {
-        int spriteDataSize = m_spriteSize * m_spriteSize * 4;
-
         if (!m_sprites.empty()) {
             if (id >= (int)m_sprites.size())
                 return nullptr;
@@ -450,8 +450,15 @@ ImagePtr SpriteManager::getSpriteImageCasual(int id)
         m_spritesFile->getU8();
 
         uint16 pixelDataSize = m_spritesFile->getU16();
-
-        ImagePtr image(new Image(Size(m_spriteSize, m_spriteSize)));
+        uint8_t spriteScale = 2;
+        uint16_t spriteSize = m_spriteSize / spriteScale;
+        const uint16 spriteDataSize = spriteSize * spriteSize * 4;
+        
+        if (pixelDataSize == 0 || spriteSize == 0) {
+            return nullptr;
+        }
+        
+        ImagePtr image(new Image(Size(spriteSize, spriteSize)));
 
         uint8* pixels = image->getPixelData();
         int writePos = 0;
@@ -482,7 +489,48 @@ ImagePtr SpriteManager::getSpriteImageCasual(int id)
             }
         }
 
-        return image;
+        // Ensure we have enough pixel data
+        if (writePos < spriteDataSize) {
+            // Fill remaining pixels with transparent
+            while (writePos < spriteDataSize) {
+                pixels[writePos++] = 0;
+                pixels[writePos++] = 0;
+                pixels[writePos++] = 0;
+                pixels[writePos++] = 0;
+            }
+        }
+
+        std::vector<uint32_t> srcData(spriteSize * spriteSize);
+        for (int i = 0; i < spriteSize * spriteSize; ++i) {
+            uint32_t r = pixels[i * 4 + 0];
+            uint32_t g = pixels[i * 4 + 1];
+            uint32_t b = pixels[i * 4 + 2];
+            uint32_t a = pixels[i * 4 + 3];
+            srcData[i] = (a << 24) | (r << 16) | (g << 8) | b;
+        }
+
+        // Criar imagem temporária para upscaling
+        ImagePtr tempImage(new Image(Size(spriteSize, spriteSize), 4, pixels));
+        
+        // Configuração aprimorada do xBRZ para melhor qualidade visual
+        xbrz::ScalerCfg cfg;
+        cfg.luminanceWeight = 1.0;
+        cfg.equalColorTolerance = 25.0;  // Reduzido para preservar mais detalhes
+        cfg.dominantDirectionThreshold = 3.4;  // Melhor preservação de bordas
+        cfg.steepDirectionThreshold = 2.0;  // Melhor suavização
+        Upscaler::setXBRZConfig(cfg);
+        
+        // Usar sistema unificado de upscaling (permite escolher algoritmo)
+        // Por padrão usa xBRZ, mas pode ser alterado para HQNX ou outros
+        UpscaleAlgorithm algorithm = Upscaler::getCurrentAlgorithm();
+        ImagePtr scaledImage = Upscaler::upscale(tempImage, algorithm, spriteScale);
+        
+        // Aplicar pós-processamento se habilitado
+        if (Upscaler::isPostProcessingEnabled()) {
+            scaledImage = Upscaler::applyPostProcessing(scaledImage);
+        }
+
+        return scaledImage;
     }
     catch (stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));

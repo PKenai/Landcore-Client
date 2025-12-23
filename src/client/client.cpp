@@ -25,6 +25,7 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/shadermanager.h>
+#include <framework/graphics/upscaler.h>
 #include "game.h"
 #include "map.h"
 #include "spritemanager.h"
@@ -44,6 +45,9 @@ void Client::init(std::vector<std::string>& args)
     g_game.init();
     g_shaders.init();
     g_things.init();
+    
+    // Inicializar sistema de upscaling e shader de pós-processamento
+    Upscaler::initPostProcessingShader();
     g_healthBars.init();
 }
 

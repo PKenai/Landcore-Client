@@ -189,6 +189,15 @@
     <ClCompile Include="..\src\framework\graphics\image.cpp">
       <Filter>Source Files\framework\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\graphics\xbrz.cpp">
+      <Filter>Source Files\framework\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\graphics\upscaler.cpp">
+      <Filter>Source Files\framework\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\graphics\hqnx.cpp">
+      <Filter>Source Files\framework\graphics</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\framework\graphics\painter.cpp">
       <Filter>Source Files\framework\graphics</Filter>
     </ClCompile>
@@ -660,6 +669,18 @@
       <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\framework\graphics\image.h">
+      <Filter>Header Files\framework\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\graphics\xbrz.h">
+      <Filter>Header Files\framework\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\graphics\config.h">
+      <Filter>Header Files\framework\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\graphics\upscaler.h">
+      <Filter>Header Files\framework\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\graphics\hqnx.h">
       <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\framework\graphics\painter.h">

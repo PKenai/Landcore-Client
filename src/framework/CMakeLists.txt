@@ -426,6 +426,13 @@ if(FRAMEWORK_GRAPHICS)
         ${CMAKE_CURRENT_LIST_DIR}/graphics/hardwarebuffer.h
         ${CMAKE_CURRENT_LIST_DIR}/graphics/image.cpp
         ${CMAKE_CURRENT_LIST_DIR}/graphics/image.h
+        ${CMAKE_CURRENT_LIST_DIR}/graphics/xbrz.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/graphics/xbrz.h
+        ${CMAKE_CURRENT_LIST_DIR}/graphics/config.h
+        ${CMAKE_CURRENT_LIST_DIR}/graphics/upscaler.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/graphics/upscaler.h
+        ${CMAKE_CURRENT_LIST_DIR}/graphics/hqnx.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/graphics/hqnx.h
         ${CMAKE_CURRENT_LIST_DIR}/graphics/painter.cpp
         ${CMAKE_CURRENT_LIST_DIR}/graphics/painter.h
         ${CMAKE_CURRENT_LIST_DIR}/graphics/paintershaderprogram.cpp
