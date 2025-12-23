@@ -975,9 +975,9 @@ function setupAction(widget)
     widget.callback = function()
       if modules.game_interface.isChatVisible() then
         if widget.autoSay then
-          modules.game_console.sendMessage(widget.sayText)
+          modules.game_chat.sendMessage(widget.sayText)
         else
-          modules.game_console.setTextEditText(widget.sayText)
+          modules.game_chat.setTextEditText(widget.sayText)
         end
       elseif widget.autoSay then
         g_game.talk(widget.sayText)

@@ -1,0 +1,70 @@
+UIWindow
+  id: UIWindow
+  pos: 0 0
+  size: 394 83
+  anchors.bottom: parent.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  text: Window
+  focusable: false
+  phantom: true
+  UIButton
+    id: Button
+    pos: 10 20
+    size: 56 52
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    text: s1
+    image-source: imgs/ui_example - Copia - Copia.png
+    margin-bottom: 11
+    margin-left: 10
+  UIButton
+    id: Button_1
+    pos: 70 20
+    size: 56 52
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    text: s2
+    image-source: imgs/ui_example - Copia - Copia.png
+    margin-bottom: 11
+    margin-left: 70
+  UIButton
+    id: Button_2
+    pos: 130 20
+    size: 56 52
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    text: s3
+    image-source: imgs/ui_example - Copia - Copia.png
+    margin-bottom: 11
+    margin-left: 130
+  UIButton
+    id: Button_3
+    pos: 210 20
+    size: 56 52
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    text: s4
+    image-source: imgs/ui_example - Copia - Copia.png
+    margin-bottom: 11
+    margin-right: 128
+  UIButton
+    id: Button_4
+    pos: 270 20
+    size: 56 52
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    text: s5
+    image-source: imgs/ui_example - Copia - Copia.png
+    margin-bottom: 11
+    margin-right: 68
+  UIButton
+    id: Button_5
+    pos: 330 20
+    size: 56 52
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    text: s6
+    image-source: imgs/ui_example - Copia - Copia.png
+    margin-bottom: 11
+    margin-right: 8
+

@@ -1,0 +1,12 @@
+Module
+  name: spellbar
+  description: Projeto OTUI
+  author: OTUI Editor
+  sandboxed: true
+  autoload: true
+  reloadable: true
+  hot-reload: true
+  hot-reload-interval: 32762
+  scripts: [ spellbar ]
+  @onLoad: init()
+  @onUnload: terminate()

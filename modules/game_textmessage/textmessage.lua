@@ -87,7 +87,7 @@ function displayMessage(mode, text)
   if msgtype == MessageSettings.none then return end
 
   if msgtype.consoleTab ~= nil and (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
-    modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
+    modules.game_chat.addText(text, msgtype, tr(msgtype.consoleTab))
     --TODO move to game_console
   end
 

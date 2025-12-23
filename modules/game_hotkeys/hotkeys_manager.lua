@@ -433,7 +433,7 @@ end
 
 function doKeyCombo(keyCombo, repeated)
   if not g_game.isOnline() then return end
-  if modules.game_console and modules.game_console.isChatEnabled() then
+  if modules.game_chat and modules.game_chat.isChatEnabled() then
     if keyCombo:len() == 1 then 
       return
     end
@@ -457,9 +457,9 @@ function doKeyCombo(keyCombo, repeated)
   elseif hotKey.itemId == nil then
     if not hotKey.value or #hotKey.value == 0 then return end
     if hotKey.autoSend then
-      modules.game_console.sendMessage(hotKey.value)
+      modules.game_chat.sendMessage(hotKey.value)
     else
-      modules.game_console.setTextEditText(hotKey.value)
+      modules.game_chat.setTextEditText(hotKey.value)
     end
     hotKey.hotkeyDelayTo = g_clock.millis() + hotkeyDelay
   elseif hotKey.useType == HOTKEY_MANAGER_USE then

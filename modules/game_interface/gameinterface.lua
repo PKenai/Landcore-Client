@@ -503,7 +503,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         menu:addSeparator()
         local creatureName = creatureThing:getName()
         menu:addOption(tr('Message to %s', creatureName), function() g_game.openPrivateChannel(creatureName) end)
-        if modules.game_console.getOwnPrivateTab() then
+        if modules.game_chat.getOwnPrivateTab() then
           menu:addOption(tr('Invite to private chat'), function() g_game.inviteToOwnChannel(creatureName) end)
           menu:addOption(tr('Exclude from private chat'), function() g_game.excludeFromOwnChannel(creatureName) end) -- [TODO] must be removed after message's popup labels been implemented
         end
@@ -511,10 +511,10 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
           menu:addOption(tr('Add to VIP list'), function() g_game.addVip(creatureName) end)
         end
 
-        if modules.game_console.isIgnored(creatureName) then
-          menu:addOption(tr('Unignore') .. ' ' .. creatureName, function() modules.game_console.removeIgnoredPlayer(creatureName) end)
+        if modules.game_chat.isIgnored(creatureName) then
+          menu:addOption(tr('Unignore') .. ' ' .. creatureName, function() modules.game_chat.removeIgnoredPlayer(creatureName) end)
         else
-          menu:addOption(tr('Ignore') .. ' ' .. creatureName, function() modules.game_console.addIgnoredPlayer(creatureName) end)
+          menu:addOption(tr('Ignore') .. ' ' .. creatureName, function() modules.game_chat.addIgnoredPlayer(creatureName) end)
         end
 
         local localPlayerShield = localPlayer:getShield()
@@ -975,8 +975,8 @@ function refreshViewMode()
 
     modules.client_topmenu.getTopMenu():setImageColor('white')
   
-    if modules.game_console then
-      modules.game_console.switchMode(false)
+    if modules.game_chat then
+      modules.game_chat.switchMode(false)
     end
   else
     g_game.changeMapAwareRange(31, 21)
@@ -994,8 +994,8 @@ function refreshViewMode()
     if g_app.isMobile() then
       gameMapPanel:setMarginTop(-32)   
     end
-    if modules.game_console then
-      modules.game_console.switchMode(true)
+    if modules.game_chat then
+      modules.game_chat.switchMode(true)
     end
   end
 --  if modules.game_actionbar then

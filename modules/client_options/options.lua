@@ -333,8 +333,15 @@ function setOption(key, value, force)
       g_game.setMaxPreWalkingSteps(1)    
     end
   elseif key == 'wsadWalking' then
-    if modules.game_console and modules.game_console.consoleToggleChat:isChecked() ~= value then
-      modules.game_console.consoleToggleChat:setChecked(value)
+    if modules.game_chat then
+      local chatEnabled = modules.game_chat.isChatEnabled()
+      if chatEnabled == value then
+        if value then
+          modules.game_chat.disableChat()
+        else
+          modules.game_chat.enableChat()
+        end
+      end
     end
   elseif key == 'hotkeyDelay' then
     generalPanel:getChildById('hotkeyDelayLabel'):setText(tr('Hotkey delay: %s ms', value))  
