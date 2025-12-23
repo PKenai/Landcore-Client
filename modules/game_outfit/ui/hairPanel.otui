@@ -1,0 +1,95 @@
+PaperdollItem < UIButton
+  size: 64 64
+  image-source: /images/ui/item
+  image-border: 1
+  margin: 2
+
+  $hover:
+    image-color: #ffffff88
+
+  $pressed:
+    image-color: #ffffff44
+
+  $disabled:
+    image-color: #ffffff55
+
+PanelCustomHair < PanelRoundedSolid
+  image-color: #626262
+  focusable: true
+  phantom: false
+  padding: 8
+
+  @onClick: modules.game_outfit.onPaperdollItemSelect(self)
+
+  $focus:
+    image-color: #3d3d3dff
+
+  Creature
+    id: outfit
+    size: 64 64
+    anchors.centerIn: parent
+    margin-top: 3
+    phantom: true
+    image-color: #00000000
+    border-width: 0
+
+CustomHairGrid < ScrollablePanel
+  layout:
+    type: grid
+    cell-size: 70 80
+    cell-spacing: 5
+    flow: true
+
+PanelRoundedSolid
+  id: hairPanel
+  image-color: #2a2a2a
+  padding: 15 8 8 15
+
+  Panel
+    id: colorsSection
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 120
+    margin-bottom: 10
+    
+    Label
+      !text: tr('Colors')
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: 5
+      margin-left: 5
+      
+    Panel
+      id: colorGridPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-left: 5
+      margin-right: 5
+      layout:
+        type: grid
+        cell-size: 13 13
+        cell-spacing: 1
+        flow: true
+
+  CustomHairGrid
+    id: list
+    anchors.top: colorsSection.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    vertical-scrollbar: scroll
+    margin-left: 5
+    margin-right: 20
+
+  VerticalScrollBar
+    id: scroll
+    anchors.top: colorsSection.bottom
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 14
+    pixels-scroll: true
+    visible: false

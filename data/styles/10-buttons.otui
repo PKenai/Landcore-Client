@@ -1,0 +1,488 @@
+ButtonBase < UIButton
+  image-source: /images/ui/button_base
+  image-border: 10
+  change-cursor-image: true
+  cursor: pointer
+  icon-color: #FFFFFF
+  color: #FFFFFF
+
+  $disabled:
+    image-color: #C4C4C4
+    icon-color: #545353
+    color: #888888
+    change-cursor-image: false
+
+ButtonCommunityBase < UIButton
+  image-source: /images/ui/button_community
+  image-border: 10
+  change-cursor-image: true
+  cursor: pointer
+
+Button < UIButton
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 1
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+    text-offset: 1 1
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+    change-cursor-image: false
+
+Button2 < UIButton
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 1
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+    text-offset: 1 1
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+    change-cursor-image: false
+    
+  $hover !on:
+    image-clip: 0 23 22 23
+    color: #dfdfdf
+    
+  $on:
+    image-clip: 0 46 22 23
+    color: #dfdfdf
+    
+Button3 < UIButton
+  font: cipsoftFont
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 1
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+    change-cursor-image: false
+    
+  $on:
+    image-clip: 0 46 22 23
+    
+Button4 < UIButton
+  font: cipsoftFont
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 1
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+
+  $disabled:
+    text-offset: 1 2
+    image-clip: 0 46 22 23
+    change-cursor-image: false
+
+  $on:
+    image-clip: 0 46 22 23
+
+TabButton < UIButton
+  size: 22 23
+  image-source: /images/ui/tabbutton_rounded
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  text-offset: 0 1
+  icon-color: #dfdfdf
+  color: #dfdfdf
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !on:
+    image-clip: 0 23 22 23
+    color: #dfdfdf
+
+  $disabled:
+    image-color: #dfdfdf66
+    icon-color: #dfdfdf
+    change-cursor-image: false
+
+  $on:
+    image-clip: 0 46 22 23
+    color: #dfdfdf
+
+NextButton < UIButton
+  size: 12 21
+  image-source: /images/ui/arrow_horizontal
+  image-clip: 12 0 12 21
+  image-color: #ffffff
+  text-offset: 0 1
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !disabled:
+    image-clip: 12 21 12 21
+
+  $pressed:
+    image-clip: 12 21 12 21
+
+  $disabled:
+    image-color: #dfdfdf88
+    change-cursor-image: false
+
+PreviousButton < UIButton
+  size: 12 21
+  image-source: /images/ui/arrow_horizontal
+  image-clip: 0 0 12 21
+  image-color: #ffffff
+  text-offset: 0 1
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !disabled:
+    image-clip: 0 21 12 21
+
+  $pressed:
+    image-clip: 0 21 12 21
+
+  $disabled:
+    image-color: #dfdfdf88
+    change-cursor-image: false
+
+AddButton < UIButton
+  size: 20 20
+  image-source: /images/ui/icon_add
+  image-color: #dfdfdfff
+  text-offset: 0 1
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !disabled:
+    image-color: #dfdfdf99
+
+  $pressed:
+    image-color: #dfdfdf44
+
+  $disabled:
+    image-color: #dfdfdf55
+    change-cursor-image: false
+
+CombatButton < UIButton
+  size: 20 20
+  image-clip: 0 0 20 20
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !disabled:
+    image-color: #ffffff
+
+  $pressed:
+    image-color: #cccccc
+
+  $disabled:
+    image-color: #dfdfdf55
+    change-cursor-image: false
+    
+  $on:
+    image-clip: 0 20 20 20
+
+ButtonGuild < UIButton
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 1
+  image-source: /images/ui/Button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+    text-offset: 1 1
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+    change-cursor-image: false
+
+ButtonBlueBase < ButtonBase
+  image-color: #3b3b3bff
+
+  $hover:
+    image-color: #616161ff
+
+  $pressed:
+    image-color: #303030ff
+
+ButtonBlueSmall < ButtonBlueBase
+  size: 115 40
+  font: DMSans-13px-bold
+
+ButtonBlueMedium < ButtonBlueBase
+  size: 206 50
+  font: DMSans-16px-bold
+
+ButtonBlueLarge < ButtonBlueBase
+  size: 265 50
+  font: DMSans-16px-bold
+
+ButtonRedBase < ButtonBase
+  image-color: #2a2a2a
+
+  $hover:
+    image-color: #3a3a3aff
+
+  $pressed:
+    image-color: #464646ff
+
+ButtonRedSmall < ButtonRedBase
+  size: 115 40
+  font: DMSans-13px-bold
+
+ButtonRedMedium < ButtonRedBase
+  size: 206 50
+  font: DMSans-16px-bold
+
+ButtonRedLarge < ButtonRedBase
+  size: 265 50
+  font: DMSans-16px-bold
+
+ButtonBlueCommunityBase < ButtonCommunityBase
+  image-color: #0466C8
+
+  $hover:
+    image-color: #057FFA
+
+  $pressed:
+    image-color: #69B2FC
+
+  $disabled:
+    image-color: #C4C4C4
+
+ButtonWarningBase < ButtonBase
+  image-color: #E5BC6D
+
+  $hover:
+    image-color: #FFC658
+
+  $pressed:
+    image-color: #E4AD42
+
+ButtonWarningSmall < ButtonWarningBase
+  size: 115 40
+  font: DMSans-13px-bold
+
+ButtonWarningMedium < ButtonWarningBase
+  size: 206 50
+  font: DMSans-16px-bold
+
+ButtonWarningLarge < ButtonWarningBase
+  size: 265 50
+  font: DMSans-16px-bold
+
+ButtonBlueCommunitySmall < ButtonBlueCommunityBase
+  size: 115 40
+
+ButtonBlueCommunityMedium < ButtonBlueCommunityBase
+  size: 206 50
+
+ButtonBlueCommunityLarge < ButtonBlueCommunityBase
+  size: 265 50
+
+ButtonClose < ButtonBase
+  size: 24 24
+  image-color: #E12F2F
+  icon: /images/game/icons/button-close
+
+  $hover:
+    image-color: #F2374D
+
+  $pressed:
+    image-color: #EE2C43
+
+ButtonPaginationBase < UIButton
+  size: 18 18
+  image-source: /images/ui/button_pagination
+  image-color: #FFFFFF
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover:
+    image-color: #69B2FC
+
+  $pressed:
+    image-color: #057FFA
+
+  $disabled:
+    image-color: #8B8686
+    change-cursor-image: false
+
+ButtonPrevious < ButtonPaginationBase
+  image-clip: 19 0 18 18
+
+ButtonNext < ButtonPaginationBase
+  image-clip: 0 22 18 18
+
+ButtonFirst < ButtonPaginationBase
+  image-clip: 0 0 18 18
+
+ButtonLast < ButtonPaginationBase
+  image-clip: 19 22 18 18
+
+ButtonCopyPast < ButtonBlueBase
+  size: 30 30
+  image-source: /images/game/icons/icon_copy_past
+
+ToggleButton < UICheckBox
+  size: 40 18
+  image-source: /images/ui/toggle_button
+  image-clip: 0 0 40 18
+  image-rect: 0 0 40 18
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover:
+    image-clip: 0 18 40 18
+
+  $checked:
+    image-clip: 0 36 40 18
+
+  $checked hover:
+    image-clip: 0 54 40 18
+
+  $disabled:
+    change-cursor-image: false
+
+RadioButton < UICheckBox
+  size: 20 20
+  image-source: /images/ui/radio_button
+  image-clip: 0 0 20 20
+  image-rect: 0 0 20 20
+  text-align: left
+  text-offset: 28 0
+  text-auto-resize: true
+  font: DMSans-16px-regular
+  image-color: #CCCCCC
+  color: #CCCCCC
+  change-cursor-image: true
+  cursor: pointer
+
+  $hover:
+    image-color: #FFFFFF
+    color: #FFFFFF
+
+  $checked:
+    image-clip: 0 20 20 20
+    image-color: #0466C8
+
+  $hover checked:
+    image-color: #69B2FC
+    color: #FFFFFF
+
+  $disabled:
+    change-cursor-image: false
+
+ButtonLabel < UIButton
+  color: #0466C8
+  cursor: pointer
+  text-auto-resize: true
+  change-cursor-image: true
+
+  $hover:
+    color: #057FFA
+
+  $pressed:
+    color: #69B2FC
+
+  $disabled:
+    change-cursor-image: false
+    color: #555555
+
+TabButton < ButtonBlueSmall
+  image-color: #69B2FC
+
+  $checked:
+    image-color: #0466C8
+
+  $on:
+    image-color: #2B2B2B
+
+ButtonEye < UIButton
+  size: 24 24
+  image-source: /images/game/icons/eyes_on_off
+  image-clip: 0 0 24 24
+  change-cursor-image: true
+  cursor: pointer
+
+  $on:
+    image-clip: 0 24 24 24
+
+ButtonEnterGameBase < UIButton
+  change-cursor-image: true
+  cursor: pointer
+  opacity: 1.0
+  font: proximanova-bold-16
+
+  $hover !disabled:
+    opacity: 0.8
+
+  $pressed:
+    opacity: 0.6
+
+  $disabled:
+    opacity: 0.5
+    change-cursor-image: false
+
+ButtonEnterGame < ButtonEnterGameBase
+  size: 110 45

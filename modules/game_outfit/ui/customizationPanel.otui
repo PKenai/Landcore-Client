@@ -1,0 +1,160 @@
+ColorBox < UICheckBox
+  size: 16 17
+  image-color: #dfdfdfff
+  image-source: /images/ui/colorbox
+
+  $checked:
+    image-clip: 16 0 16 17
+
+  $!checked:
+    image-clip: 0 0 16 17
+
+PanelRoundedSolid
+  id: customizationPanel
+  image-color: #2a2a2a
+  padding: 8 6 6 8
+  width: 320
+
+  Panel
+    id: addonsSection
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 70
+    image-source: /images/ui/panel_flat
+    image-border: 1
+    margin-bottom: 10
+
+    Label
+      id: addonsTitle
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 18
+      text: Addons
+      text-align: center
+      background-color: #333333
+      margin-bottom: 3
+
+    Panel
+      id: addonsContent
+      anchors.top: addonsTitle.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin: 8
+      layout:
+        type: horizontalBox
+        spacing: 40
+        align-center: true
+
+      Panel
+        id: addon1Panel
+        width: 80
+        height: 25
+
+        Label
+          id: addon1Label
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          text: Addon 1
+          font: verdana-11px-antialised
+          width: 50
+
+        CheckBox
+          id: addon1Check
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+
+      Panel
+        id: addon2Panel
+        width: 80
+        height: 25
+
+        Label
+          id: addon2Label
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          text: Addon 2
+          font: verdana-11px-antialised
+          width: 50
+
+        CheckBox
+          id: addon2Check
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+
+  Panel
+    id: colorsSection
+    anchors.top: addonsSection.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    image-source: /images/ui/panel_flat
+    image-border: 1
+    margin-top: 5
+
+    Label
+      id: colorsTitle
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 18
+      text: Colors
+      text-align: center
+      background-color: #333333
+      margin-bottom: 3
+
+    Panel
+      id: colorModePanel
+      anchors.top: colorsTitle.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      width: 290
+      height: 25
+      margin-top: 5
+      layout:
+        type: horizontalBox
+        spacing: 3
+        align-center: true
+
+      ButtonBox
+        id: headButton
+        width: 70
+        text: Head
+        checkable: true
+        font: verdana-11px-antialised
+
+      ButtonBox
+        id: primaryButton
+        width: 70
+        text: Primary
+        checkable: true
+        font: verdana-11px-antialised
+
+      ButtonBox
+        id: secondaryButton
+        width: 70
+        text: Secondary
+        checkable: true
+        font: verdana-11px-antialised
+
+      ButtonBox
+        id: detailButton
+        width: 70
+        text: Detail
+        checkable: true
+        font: verdana-11px-antialised
+
+    Panel
+      id: colorGridPanel
+      anchors.top: colorModePanel.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      width: 310
+      height: 125
+      margin-top: 8
+      layout:
+        type: grid
+        cell-size: 16 17
+        cell-spacing: 0
+        num-columns: 19
+        num-lines: 7

@@ -1,0 +1,137 @@
+OutfitCustomPreviewPanel < PanelRoundedSolid
+  width: 220
+  padding: 20 18
+  image-color: #2a2a2a
+
+  Label-16px-Bold
+    id: title
+    anchors.bottom: next.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-auto-resize: true
+    text-align: center
+    text-wrap: true
+    stroke: 1 #000000
+    margin-bottom: 5
+
+  Label-16px-Bold
+    id: name
+    anchors.bottom: outfit.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-auto-resize: true
+    text-align: center
+    text-wrap: true
+    stroke: 1 #000000
+    margin-bottom: 20
+
+  Creature
+    id: outfit
+    size: 126 126
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    margin-top: -20
+    &direction: 2
+    image-color: #00000000
+    border-width: 0
+    phantom: true
+
+  ButtonBlueBase
+    size: 32 32
+    anchors.right: parent.horizontalCenter
+    anchors.bottom: next.bottom
+    icon: /images/game/outfits/icon_rotate
+    margin-right: 5
+    !tooltip: tr('Rotate')
+    @onClick: |
+      local parent = self:getParent()
+      parent.outfit.direction = (parent.outfit.direction + 1) % 4
+      parent.outfit:setDirection(parent.outfit.direction)
+
+  ButtonBlueBase
+    size: 32 32
+    anchors.left: parent.horizontalCenter
+    anchors.bottom: next.top
+    icon: /images/game/outfits/walking
+    icon-clip: 0 44 22 22
+    icon-color: #FFFFFF
+    margin: 0 5 15 0
+    !tooltip: tr('Walking')
+    @onClick: |
+      local parent = self:getParent()
+      self:setOn(not self:isOn())
+      parent.outfit:setAnimate(self:isOn())
+
+    $on:
+      icon-color: #A8FF80
+
+  ButtonBlueSmall
+    id: confirm
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    !text: tr('Confirm')
+    @onClick: modules.game_outfit.confirmChoose()
+
+  UIWidget
+    id: texture
+    anchors.horizontalCenter: name.horizontalCenter
+    anchors.verticalCenter: name.verticalCenter
+    size: 110 20
+
+OutfitCustomTabBarVertical < TabBarVertical
+  image-color: #6E6E6E
+  padding: 8
+
+OutfitCustomTabBarVerticalPanel < TabBarVerticalPanel
+  
+OutfitCustomTabBarVerticalButton < TabBarVerticalButton
+  text-only-upper-case: false
+  text-align: center
+  text-offset: 0 0
+  height: 35
+  margin-bottom: 2
+  text-color: #DDDDDD
+  
+  $hover:
+    text-color: #FFFFFF
+    
+  $!on:
+    text-color: #AAAAAA
+    
+  $on:
+    text-color: #57AFFF
+    image-color: #3A3A3A
+
+MainWindow
+  size: 850 450
+  anchors.centerIn: parent
+  margin-left: -175
+  margin-top: -80
+  !text: tr('Customize Character')
+  &save: true
+  &autoOpen: true
+  @onEscape: modules.game_outfit.destroy()
+  @onClose: modules.game_outfit.destroy()
+
+  OutfitCustomPreviewPanel
+    id: previewPanel
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin: 20 0 2 0
+
+  OutfitCustomTabBarVertical
+    id: mainTabBar
+    width: 140
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin: 20 0 25 10
+
+  Panel
+    id: mainTabContent
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.right: previewPanel.left
+    anchors.bottom: parent.bottom
+    margin: 20 5 1 15

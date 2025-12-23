@@ -1,0 +1,47 @@
+PanelCustomMount < PanelRoundedSolid
+  image-color: #626262
+  focusable: true
+  phantom: false
+  padding: 8
+
+  @onClick: modules.game_outfit.onMountSelect(self)
+
+  $focus:
+    image-color: #3d3d3dff
+
+  Creature
+    id: mount
+    size: 54 54
+    anchors.centerIn: parent
+    margin-top: 3
+    phantom: true
+    image-color: #00000000
+    border-width: 0
+
+CustomMountGrid < ScrollablePanel
+  layout:
+    type: grid
+    cell-size: 70 80
+    cell-spacing: 5
+    flow: true
+
+PanelRoundedSolid
+  id: mountPanel
+  image-color: #2a2a2a
+  padding: 15 8 8 15
+
+  CustomMountGrid
+    id: list
+    anchors.fill: parent
+    anchors.right: next.left
+    vertical-scrollbar: scroll
+    margin-left: 5
+
+  VerticalScrollBar
+    id: scroll
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 14
+    pixels-scroll: true
+    visible: false

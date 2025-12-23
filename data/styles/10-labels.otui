@@ -1,0 +1,63 @@
+Label < UILabel
+  font: verdana-11px-antialised
+  color: #dfdfdf
+
+  $disabled:
+    color: #dfdfdf88
+
+FlatLabel < UILabel
+  font: verdana-11px-antialised
+  color: #dfdfdf
+  size: 86 20
+  text-offset: 3 3
+  image-source: /images/ui/panel_flat
+  image-border: 1
+
+  $disabled:
+    color: #dfdfdf88
+
+MenuLabel < Label
+
+GameLabel < UILabel
+  font: verdana-11px-antialised
+  color: #dfdfdf
+
+Label-12px-Regular < UILabel
+  font: DMSans-12px-regular
+  color: #FFFFFF
+
+Label-13px-Bold < UILabel
+  font: DMSans-13px-bold
+  color: #FFFFFF
+
+Label-13px-Regular < UILabel
+  font: DMSans-13px-regular
+  color: #FFFFFF
+
+Label-14px-Medium < UILabel
+  font: DMSans-14px-medium
+  color: #FFFFFF
+
+Label-14px-Regular < UILabel
+  font: DMSans-14px-regular
+  color: #FFFFFF
+
+Label-16px-Bold < UILabel
+  font: DMSans-16px-bold
+  color: #FFFFFF
+
+Label-16px-Regular < UILabel
+  font: DMSans-16px-regular
+  color: #FFFFFF
+
+Label-20px-Bold < UILabel
+  font: DMSans-20px-bold
+  color: #FFFFFF
+
+Label-26px-Bold < UILabel
+  font: DMSans-26px-bold
+  color: #FFFFFF
+
+Label-30px-Bold < UILabel
+  font: DMSans-30px-bold
+  color: #FFFFFF
