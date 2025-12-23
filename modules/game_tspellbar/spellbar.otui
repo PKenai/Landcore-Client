@@ -7,64 +7,106 @@ UIWindow
   text: Window
   focusable: false
   phantom: true
-  UIButton
-    id: Button
+  UIWidget
+    id: slot1
     pos: 10 20
     size: 56 52
     anchors.bottom: parent.bottom
     anchors.left: parent.left
-    text: s1
-    image-source: imgs/ui_example - Copia - Copia.png
     margin-bottom: 11
     margin-left: 10
-  UIButton
-    id: Button_1
+    UIImageView
+      id: slot1Icon
+      anchors.fill: parent
+      image-source: imgs/vazio.png
+    UIButton
+      id: slot1Button
+      anchors.fill: parent
+      text: s1
+      image-source: imgs/ui_example - Copia - Copia.png
+  UIWidget
+    id: slot2
     pos: 70 20
     size: 56 52
     anchors.bottom: parent.bottom
     anchors.left: parent.left
-    text: s2
-    image-source: imgs/ui_example - Copia - Copia.png
     margin-bottom: 11
     margin-left: 70
-  UIButton
-    id: Button_2
+    UIImageView
+      id: slot2Icon
+      anchors.fill: parent
+      image-source: imgs/vazio.png
+    UIButton
+      id: slot2Button
+      anchors.fill: parent
+      text: s2
+      image-source: imgs/ui_example - Copia - Copia.png
+  UIWidget
+    id: slot3
     pos: 130 20
     size: 56 52
     anchors.bottom: parent.bottom
     anchors.left: parent.left
-    text: s3
-    image-source: imgs/ui_example - Copia - Copia.png
     margin-bottom: 11
     margin-left: 130
-  UIButton
-    id: Button_3
+    UIImageView
+      id: slot3Icon
+      anchors.fill: parent
+      image-source: imgs/vazio.png
+    UIButton
+      id: slot3Button
+      anchors.fill: parent
+      text: s3
+      image-source: imgs/ui_example - Copia - Copia.png
+  UIWidget
+    id: slot4
     pos: 210 20
     size: 56 52
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    text: s4
-    image-source: imgs/ui_example - Copia - Copia.png
     margin-bottom: 11
     margin-right: 128
-  UIButton
-    id: Button_4
+    UIImageView
+      id: slot4Icon
+      anchors.fill: parent
+      image-source: imgs/vazio.png
+    UIButton
+      id: slot4Button
+      anchors.fill: parent
+      text: s4
+      image-source: imgs/ui_example - Copia - Copia.png
+  UIWidget
+    id: slot5
     pos: 270 20
     size: 56 52
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    text: s5
-    image-source: imgs/ui_example - Copia - Copia.png
     margin-bottom: 11
     margin-right: 68
-  UIButton
-    id: Button_5
+    UIImageView
+      id: slot5Icon
+      anchors.fill: parent
+      image-source: imgs/vazio.png
+    UIButton
+      id: slot5Button
+      anchors.fill: parent
+      text: s5
+      image-source: imgs/ui_example - Copia - Copia.png
+  UIWidget
+    id: slot6
     pos: 330 20
     size: 56 52
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    text: s6
-    image-source: imgs/ui_example - Copia - Copia.png
     margin-bottom: 11
     margin-right: 8
+    UIImageView
+      id: slot6Icon
+      anchors.fill: parent
+      image-source: imgs/vazio.png
+    UIButton
+      id: slot6Button
+      anchors.fill: parent
+      text: s6
+      image-source: imgs/ui_example - Copia - Copia.png
 
