@@ -1,0 +1,8 @@
+Module
+  name: game_minimap_center
+  description: Minimap centered window
+  author: User
+  sandboxed: true
+  scripts: [ minimap_center ]
+  @onLoad: init()
+  @onUnload: terminate()

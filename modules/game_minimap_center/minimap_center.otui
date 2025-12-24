@@ -1,0 +1,16 @@
+MinimapCenterWindow < UIWidget
+  id: minimapCenterWindow
+  size: 300 300
+  visible: true
+  enabled: true
+  x: 0
+  y: 0
+
+  Minimap
+    id: minimap
+    size: 250 250
+    anchors.centerIn: parent
+    visible: true
+    enabled: true
+    opacity: 0.4
+

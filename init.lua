@@ -73,6 +73,11 @@ local function loadModules()
   -- game modules 500-999
   g_modules.autoLoadModules(999)
   g_modules.ensureModuleLoaded("game_interface")
+  
+  -- load minimap center module
+  if g_modules.getModule("game_minimap_center") then
+    g_modules.ensureModuleLoaded("game_minimap_center")
+  end
 
   -- mods 1000-9999
   g_modules.autoLoadModules(9999)
