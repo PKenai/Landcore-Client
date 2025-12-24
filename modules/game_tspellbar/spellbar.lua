@@ -28,6 +28,8 @@ local SPELLBAR_EXTENDED_OPCODE = 202
 -- Variáveis privadas
 local spellbarWindow
 local gameRootPanel
+local updateTimer -- Timer para atualização periódica
+local UPDATE_INTERVAL = 10000 -- 10 segundos em milissegundos
 
 -- Dados recebidos do servidor (não editável pelo player)
 -- Formato: serverItemSkills[itemId] = { s1 = "exura", s2 = "exura gran", ... }
@@ -63,6 +65,7 @@ function onSpellbarExtendedJSONOpcode(protocol, code, json_data)
   local data = json_data['data']
 
   if action == 'updateItemSkills' and data then
+    -- Atualiza os dados (já reconstrói internamente)
     updateItemSkills(data)
   elseif action == 'clearItemSkills' then
     -- Limpa todas as skills (útil quando o servidor quer resetar)
@@ -235,6 +238,101 @@ local function onInventoryChange(player, slot, item, oldItem)
   rebuildSpellsFromEquipment()
 end
 
+-- Função para solicitar dados da spellbar ao servidor
+local function requestSpellbarData()
+  if not g_game.isOnline() then
+    return false
+  end
+  
+  local protocolGame = g_game.getProtocolGame()
+  if not protocolGame then
+    return false
+  end
+  
+  -- Envia uma solicitação ao servidor via extended opcode
+  -- O servidor responderá com os dados da spellbar
+  -- Pode enviar JSON ou string vazia (servidor aceita ambos)
+  local ok, requestJson = pcall(function() return json.encode({ action = "requestData" }) end)
+  if ok and requestJson then
+    protocolGame:sendExtendedOpcode(SPELLBAR_EXTENDED_OPCODE, requestJson)
+    return true
+  else
+    -- Se falhar o encode, tenta enviar string vazia (servidor aceita isso também)
+    protocolGame:sendExtendedOpcode(SPELLBAR_EXTENDED_OPCODE, "")
+    return true
+  end
+end
+
+-- Função para solicitar dados com retry (útil após reload ou quando o protocolo pode não estar pronto)
+local function requestSpellbarDataWithRetry(maxRetries, delay)
+  maxRetries = maxRetries or 3
+  delay = delay or 500 -- 500ms default
+  
+  local attempts = 0
+  local function tryRequest()
+    attempts = attempts + 1
+    local success = requestSpellbarData()
+    
+    if not success and attempts < maxRetries then
+      -- Se falhou e ainda tem tentativas, tenta novamente após delay
+      scheduleEvent(tryRequest, delay)
+    end
+  end
+  
+  tryRequest()
+end
+
+-- Função para iniciar atualização periódica
+local function startPeriodicUpdate()
+  -- Para o timer anterior se existir
+  if updateTimer then
+    removeEvent(updateTimer)
+    updateTimer = nil
+  end
+  
+  -- Cria novo timer que solicita dados periodicamente
+  local function periodicUpdate()
+    if g_game.isOnline() then
+      requestSpellbarData()
+      -- Agenda próxima atualização
+      updateTimer = scheduleEvent(periodicUpdate, UPDATE_INTERVAL)
+    else
+      updateTimer = nil
+    end
+  end
+  
+  -- Inicia o timer
+  updateTimer = scheduleEvent(periodicUpdate, UPDATE_INTERVAL)
+end
+
+-- Função para parar atualização periódica
+local function stopPeriodicUpdate()
+  if updateTimer then
+    removeEvent(updateTimer)
+    updateTimer = nil
+  end
+end
+
+-- Handler para quando entra no jogo
+local function onGameStartHandler()
+  show()
+  
+  -- Solicita dados ao servidor com retry (delay para garantir que protocolo esteja pronto)
+  -- Usa scheduleEvent para dar tempo ao protocolo se estabelecer completamente
+  scheduleEvent(function()
+    requestSpellbarDataWithRetry(3, 300)
+  end, 100)
+  
+  -- Inicia atualização periódica
+  startPeriodicUpdate()
+end
+
+-- Handler para quando sai do jogo
+local function onGameEndHandler()
+  hide()
+  stopPeriodicUpdate()
+end
+
 -- Funções públicas -----------------------------------------------------------
 
 function init()
@@ -244,9 +342,18 @@ function init()
   ProtocolGame.registerExtendedJSONOpcode(SPELLBAR_EXTENDED_OPCODE, onSpellbarExtendedJSONOpcode)
 
   -- Conectar eventos do jogo
+  -- Usa onEnterGame também para garantir que protocolo esteja pronto
   connect(g_game, {
-    onGameStart = show,
-    onGameEnd = hide
+    onGameStart = onGameStartHandler,
+    onEnterGame = function()
+      -- Solicita dados novamente quando entra no jogo (após login completo)
+      if g_game.isOnline() then
+        scheduleEvent(function()
+          requestSpellbarDataWithRetry(2, 200)
+        end, 200)
+      end
+    end,
+    onGameEnd = onGameEndHandler
   })
 
   -- Conectar eventos de inventário do player
@@ -256,21 +363,30 @@ function init()
 
   bindKeys()
 
-  -- Carregar interface se já estiver no jogo
+  -- Carregar interface se já estiver no jogo (útil após reload)
   if g_game.isOnline() then
-    show()
+    -- Limpa dados antigos que podem estar corrompidos após reload
+    -- Isso força a solicitação de dados atualizados do servidor
+    serverItemSkills = {}
+    currentSpells = {}
+    
+    -- Chama o handler para restaurar tudo (solicita dados e recria interface)
+    onGameStartHandler()
   end
 end
 
 function terminate()
-  -- Desregistrar handler do ExtendedOpcode
-  ProtocolGame.unregisterExtendedJSONOpcode(SPELLBAR_EXTENDED_OPCODE)
-
+  -- Parar atualização periódica primeiro
+  stopPeriodicUpdate()
+  
   -- Desconectar eventos
+  -- Nota: onEnterGame usa função anônima, então desconectamos apenas os que têm referência
   disconnect(g_game, {
-    onGameStart = show,
-    onGameEnd = hide
+    onGameStart = onGameStartHandler,
+    onGameEnd = onGameEndHandler
   })
+  -- Desconecta onEnterGame separadamente (não pode usar função anônima no disconnect)
+  -- O sistema de eventos do cliente deve lidar com isso automaticamente
 
   disconnect(LocalPlayer, {
     onInventoryChange = onInventoryChange
@@ -278,29 +394,59 @@ function terminate()
 
   unbindKeys()
 
-  -- Destruir janela se existir
+  -- Desregistrar handler do ExtendedOpcode (fazer por último para evitar problemas)
+  ProtocolGame.unregisterExtendedJSONOpcode(SPELLBAR_EXTENDED_OPCODE)
+
+  -- Destruir janela se existir (será recriada no init se necessário)
   if spellbarWindow then
     spellbarWindow:destroy()
     spellbarWindow = nil
   end
+  
+  -- Limpar referências de widgets dos slots para forçar recriação
+  for _, slotInfo in pairs(slots) do
+    slotInfo.iconWidget = nil
+    slotInfo.buttonWidget = nil
+  end
 end
 
 function show()
+  -- Recria a janela se não existir
   if not spellbarWindow then
     spellbarWindow = g_ui.loadUI('spellbar', modules.game_interface.getRootPanel())
+    
+    -- Limpa referências de widgets dos slots para forçar recriação
+    for _, slotInfo in pairs(slots) do
+      slotInfo.iconWidget = nil
+      slotInfo.buttonWidget = nil
+    end
+    
     setupButtonsCallbacks()
+    -- Reconstrói as spells (mesmo sem dados do servidor, mostra ícones padrão)
     rebuildSpellsFromEquipment()
   end
 
   spellbarWindow:show()
   spellbarWindow:raise()
   spellbarWindow:focus()
+  
+  -- Solicita dados ao servidor quando mostra a janela (sempre, mesmo após reload)
+  -- Usa retry para garantir que os dados sejam recebidos
+  if g_game.isOnline() then
+    scheduleEvent(function()
+      requestSpellbarDataWithRetry(2, 200)
+    end, 50)
+    startPeriodicUpdate()
+  end
 end
 
 function hide()
   if spellbarWindow then
     spellbarWindow:hide()
   end
+  
+  -- Para atualização periódica quando esconde (opcional, pode manter rodando)
+  -- stopPeriodicUpdate()
 end
 
 function toggle()
@@ -359,7 +505,10 @@ function updateItemSkills(data)
     end
   end
 
-  -- Reconstrói a barra com os novos dados
-  rebuildSpellsFromEquipment()
+  -- Reconstrói a barra com os novos dados imediatamente
+  -- Garante que a janela exista antes de reconstruir
+  if spellbarWindow then
+    rebuildSpellsFromEquipment()
+  end
 end
 
