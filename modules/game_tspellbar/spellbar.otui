@@ -4,7 +4,7 @@ UIWindow
   size: 394 83
   anchors.bottom: parent.bottom
   anchors.horizontalCenter: parent.horizontalCenter
-  text: Window
+  text: Item skills
   focusable: false
   phantom: true
   UIWidget
@@ -22,7 +22,6 @@ UIWindow
     UIButton
       id: slot1Button
       anchors.fill: parent
-      text: s1
       image-source: imgs/ui_example - Copia - Copia.png
   UIWidget
     id: slot2
@@ -39,7 +38,6 @@ UIWindow
     UIButton
       id: slot2Button
       anchors.fill: parent
-      text: s2
       image-source: imgs/ui_example - Copia - Copia.png
   UIWidget
     id: slot3
@@ -56,7 +54,6 @@ UIWindow
     UIButton
       id: slot3Button
       anchors.fill: parent
-      text: s3
       image-source: imgs/ui_example - Copia - Copia.png
   UIWidget
     id: slot4
@@ -73,7 +70,6 @@ UIWindow
     UIButton
       id: slot4Button
       anchors.fill: parent
-      text: s4
       image-source: imgs/ui_example - Copia - Copia.png
   UIWidget
     id: slot5
@@ -90,7 +86,6 @@ UIWindow
     UIButton
       id: slot5Button
       anchors.fill: parent
-      text: s5
       image-source: imgs/ui_example - Copia - Copia.png
   UIWidget
     id: slot6
@@ -107,6 +102,5 @@ UIWindow
     UIButton
       id: slot6Button
       anchors.fill: parent
-      text: s6
       image-source: imgs/ui_example - Copia - Copia.png
 
