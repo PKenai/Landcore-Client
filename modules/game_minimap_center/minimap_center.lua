@@ -15,6 +15,16 @@ fadeAnimationTimer = nil
 currentOpacity = 0.4
 targetOpacity = 0.4
 
+-- Tamanhos do minimapa
+NORMAL_WINDOW_SIZE = {width = 300, height = 300}
+NORMAL_MINIMAP_SIZE = {width = 250, height = 250}
+SMALL_WINDOW_SIZE = {width = 150, height = 150}  -- Tamanho reduzido
+SMALL_MINIMAP_SIZE = {width = 195, height = 195}  -- Tamanho reduzido (140 + 10% = 154)
+currentWindowSize = {width = 300, height = 300}
+currentMinimapSize = {width = 250, height = 250}
+targetWindowSize = {width = 300, height = 300}
+targetMinimapSize = {width = 250, height = 250}
+
 function init()
   -- Desabilitar o minimapa antigo
   disableOldMinimap()
@@ -51,6 +61,12 @@ function init()
   minimapWidget:setOpacity(0.4)
   currentOpacity = 0.4
   targetOpacity = 0.4
+  
+  -- Inicializar tamanhos
+  currentWindowSize = {width = NORMAL_WINDOW_SIZE.width, height = NORMAL_WINDOW_SIZE.height}
+  currentMinimapSize = {width = NORMAL_MINIMAP_SIZE.width, height = NORMAL_MINIMAP_SIZE.height}
+  targetWindowSize = {width = NORMAL_WINDOW_SIZE.width, height = NORMAL_WINDOW_SIZE.height}
+  targetMinimapSize = {width = NORMAL_MINIMAP_SIZE.width, height = NORMAL_MINIMAP_SIZE.height}
   
   -- Remover todos os botões do minimap
   local resetWidget = minimapWidget:recursiveGetChildById('resetWidget')
@@ -402,15 +418,24 @@ function setFullOpacity()
     fadeAnimationTimer = nil
   end
   
-  -- Iniciar fade para 100% de opacidade
+  -- Iniciar fade para 100% de opacidade e tamanho normal
   targetOpacity = 1.0
+  targetWindowSize = {width = NORMAL_WINDOW_SIZE.width, height = NORMAL_WINDOW_SIZE.height}
+  targetMinimapSize = {width = NORMAL_MINIMAP_SIZE.width, height = NORMAL_MINIMAP_SIZE.height}
   startFadeAnimation()
 end
 
 function setFadedOpacity()
-  -- Iniciar fade para 40% de opacidade
+  -- Iniciar fade para 40% de opacidade e tamanho reduzido
   targetOpacity = 0.4
+  targetWindowSize = {width = SMALL_WINDOW_SIZE.width, height = SMALL_WINDOW_SIZE.height}
+  targetMinimapSize = {width = SMALL_MINIMAP_SIZE.width, height = SMALL_MINIMAP_SIZE.height}
   startFadeAnimation()
+end
+
+-- Função de easing para animação mais suave (ease-in-out)
+local function easeInOut(t)
+  return t * t * (3.0 - 2.0 * t)
 end
 
 function startFadeAnimation()
@@ -420,17 +445,28 @@ function startFadeAnimation()
   end
   
   local startOpacity = currentOpacity
+  local startWindowSize = {width = currentWindowSize.width, height = currentWindowSize.height}
+  local startMinimapSize = {width = currentMinimapSize.width, height = currentMinimapSize.height}
   local fadeDuration = 1000  -- 1 segundo
   local startTime = g_clock.millis()
-  local steps = 20  -- Número de steps para animação suave
+  local steps = 60  -- Mais steps para animação mais suave
   local stepDuration = fadeDuration / steps
   
   local function animate()
     local elapsed = g_clock.millis() - startTime
     local progress = math.min(elapsed / fadeDuration, 1.0)
     
-    -- Interpolação linear
-    currentOpacity = startOpacity + (targetOpacity - startOpacity) * progress
+    -- Aplicar easing para animação mais suave
+    local easedProgress = easeInOut(progress)
+    
+    -- Interpolação com easing para opacidade
+    currentOpacity = startOpacity + (targetOpacity - startOpacity) * easedProgress
+    
+    -- Interpolação com easing para tamanhos
+    currentWindowSize.width = startWindowSize.width + (targetWindowSize.width - startWindowSize.width) * easedProgress
+    currentWindowSize.height = startWindowSize.height + (targetWindowSize.height - startWindowSize.height) * easedProgress
+    currentMinimapSize.width = startMinimapSize.width + (targetMinimapSize.width - startMinimapSize.width) * easedProgress
+    currentMinimapSize.height = startMinimapSize.height + (targetMinimapSize.height - startMinimapSize.height) * easedProgress
     
     -- Aplicar opacidade nos widgets
     if minimapWidget then
@@ -440,10 +476,36 @@ function startFadeAnimation()
       minimapFrame:setOpacity(currentOpacity)
     end
     
+    -- Aplicar tamanhos nos widgets
+    if minimapCenterWindow then
+      minimapCenterWindow:setWidth(math.floor(currentWindowSize.width))
+      minimapCenterWindow:setHeight(math.floor(currentWindowSize.height))
+    end
+    if minimapWidget then
+      minimapWidget:setWidth(math.floor(currentMinimapSize.width))
+      minimapWidget:setHeight(math.floor(currentMinimapSize.height))
+    end
+    
+    -- Atualizar posição da moldura após mudança de tamanho
+    updateFramePosition()
+    
+    -- Reposicionar no canto após mudança de tamanho
+    if minimapCenterWindow then
+      local screenWidth = g_window.getWidth()
+      local screenHeight = g_window.getHeight()
+      local margin = 10
+      local x = screenWidth - math.floor(currentWindowSize.width) - margin
+      local y = screenHeight - math.floor(currentWindowSize.height) - margin
+      minimapCenterWindow:setX(x)
+      minimapCenterWindow:setY(y)
+    end
+    
     if progress < 1.0 then
       fadeAnimationTimer = scheduleEvent(animate, stepDuration)
     else
       currentOpacity = targetOpacity
+      currentWindowSize = {width = targetWindowSize.width, height = targetWindowSize.height}
+      currentMinimapSize = {width = targetMinimapSize.width, height = targetMinimapSize.height}
       fadeAnimationTimer = nil
     end
   end
