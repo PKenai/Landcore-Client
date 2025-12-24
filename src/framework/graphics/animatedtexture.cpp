@@ -78,3 +78,9 @@ void AnimatedTexture::update()
     m_id = m_frames[m_currentFrame]->getId();
     m_uniqueId = m_frames[m_currentFrame]->getUniqueId();
 }
+
+void AnimatedTexture::resetAnimation()
+{
+    m_currentFrame = 0;
+    m_animTimer.restart();
+}

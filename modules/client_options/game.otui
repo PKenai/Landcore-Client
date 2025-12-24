@@ -3,6 +3,11 @@ OptionPanel
     id: classicControl
     !text: tr('Classic control')
 
+  OptionCheckBox
+    id: autoFullscreenOnStartup
+    !text: tr('Open in full screen')
+    !tooltip: tr('Automatically open client in fullscreen mode on startup')
+
     $mobile:
       visible: false
 

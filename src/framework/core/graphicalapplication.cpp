@@ -123,6 +123,7 @@ void GraphicalApplication::run()
     pollGraphics();
     g_clock.update();
 
+    // Fullscreen is now controlled via Lua settings (client_entergame module)
     // show window
     g_window.show();
 

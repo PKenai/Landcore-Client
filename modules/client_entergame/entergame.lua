@@ -9,12 +9,8 @@ local protocolLogin
 local server = nil
 local versionsFound = false
 
-local customServerSelectorPanel
-local serverSelectorPanel
-local serverSelector
-local clientVersionSelector
-local serverHostTextEdit
 local rememberPasswordBox
+local fullscreenStatusLabel
 local protos = {"740", "760", "772", "792", "800", "810", "854", "860", "870", "910", "961", "1000", "1077", "1090", "1096", "1098", "1099", "1100", "1200", "1220"}
 
 local checkedByUpdater = {}
@@ -298,66 +294,213 @@ function EnterGame.init()
   if USE_NEW_ENERGAME then return end
   enterGame = g_ui.displayUI('entergame')
   
-  serverSelectorPanel = enterGame:getChildById('serverSelectorPanel')
-  customServerSelectorPanel = enterGame:getChildById('customServerSelectorPanel')
+  if not enterGame then
+    g_logger.error("Failed to load entergame UI")
+    return
+  end
   
-  serverSelector = serverSelectorPanel:getChildById('serverSelector')
-  rememberPasswordBox = enterGame:getChildById('rememberPasswordBox')
-  serverHostTextEdit = customServerSelectorPanel:getChildById('serverHostTextEdit')
-  clientVersionSelector = customServerSelectorPanel:getChildById('clientVersionSelector')
+  -- Hide window initially - it will be shown with animation later
+  enterGame:hide()
   
-  if Servers ~= nil then 
-    for name,server in pairs(Servers) do
-      serverSelector:addOption(name)
+  -- Set background image to cover entire window, scaled proportionally with slight overflow
+  local backgroundImage = enterGame:getChildById('backgroundImage')
+  
+  if not backgroundImage then
+    return
+  end
+  
+  -- Ensure parent window doesn't clip
+  enterGame:setClipping(false)
+  
+  -- Ensure background is behind all other elements
+  backgroundImage:lower()
+  
+  -- Store reference globally so EnterGame.show() can access it
+  EnterGame.backgroundImage = backgroundImage
+  
+  -- Function to update background image size and position
+  -- Store globally so EnterGame.show() can call it
+  EnterGame.updateBackgroundImage = function()
+    local windowWidth = enterGame:getWidth()
+    local windowHeight = enterGame:getHeight()
+    
+    local bgTextureWidth = backgroundImage:getImageTextureWidth()
+    local bgTextureHeight = backgroundImage:getImageTextureHeight()
+    
+    if windowWidth <= 0 or windowHeight <= 0 then
+      return
     end
+    
+    if bgTextureWidth <= 0 or bgTextureHeight <= 0 then
+      return
+    end
+    
+    -- Disable clipping to allow overflow beyond window bounds
+    backgroundImage:setClipping(false)
+    enterGame:setClipping(false)  -- Also disable parent clipping
+    
+    -- Use original texture size for the image box
+    local newWidth = bgTextureWidth  -- 492
+    local newHeight = bgTextureHeight  -- 330
+    
+    -- Calculate offset to position image above and to the left of login button
+    -- Image is larger than window, so calculate offset from window center
+    local centerX = math.floor((windowWidth - newWidth) / 2)
+    local centerY = math.floor((windowHeight - newHeight) / 2)
+    
+    -- Break anchors first
+    backgroundImage:breakAnchors()
+    
+    -- Set image dimensions (this scales the texture)
+    backgroundImage:setImageWidth(newWidth)
+    backgroundImage:setImageHeight(newHeight)
+    
+    -- Set widget size to match image
+    backgroundImage:setSize({width = newWidth, height = newHeight})
+    
+    -- Position widget at 0,0 to ensure entire image is visible
+    backgroundImage:setX(0)
+    backgroundImage:setY(0)
+    
+    -- Use image offset to position image above and to the left of login button
+    -- Calculate offset: move left and up from center
+    local imgOffsetX = centerX - 20  -- Move 20px more to the left from center
+    local imgOffsetY = centerY - 30  -- Move 30px more up from center (above login button)
+    
+    backgroundImage:setImageOffset({x = imgOffsetX, y = imgOffsetY})
+    
+    -- Ensure it's behind other elements (especially login button)
+    backgroundImage:lower()
+    
+    -- Ensure login button is in front (get it fresh)
+    local loginButton = enterGame:getChildById('loginButton')
+    if loginButton then
+      loginButton:raise()
+    end
+    
+    -- Force show
+    backgroundImage:show()
+    backgroundImage:setVisible(true)
   end
-  if serverSelector:getOptionsCount() == 0 or ALLOW_CUSTOM_SERVERS then
-    serverSelector:addOption(tr("Another"))    
-  end  
-  for i,proto in pairs(protos) do
-    clientVersionSelector:addOption(proto)
-  end
-
-  if serverSelector:getOptionsCount() == 1 then
-    enterGame:setHeight(enterGame:getHeight() - serverSelectorPanel:getHeight())
-    serverSelectorPanel:setOn(false)
-  end
+  
+  -- Also create local reference for scheduling
+  local updateBackgroundImage = EnterGame.updateBackgroundImage
+  
+  -- Update multiple times to ensure it works
+  scheduleEvent(function()
+    updateBackgroundImage()
+    scheduleEvent(updateBackgroundImage, 100)
+    scheduleEvent(updateBackgroundImage, 300)
+  end, 10)
+  
+  rememberPasswordBox = enterGame:getChildById('rememberPasswordBox')
+  local loginButton = enterGame:getChildById('loginButton')
+  
+  -- Login button state will be controlled via functions
   
   local account = g_crypt.decrypt(g_settings.get('account'))
   local password = g_crypt.decrypt(g_settings.get('password'))
-  local server = g_settings.get('server')
-  local host = g_settings.get('host')
-  local clientVersion = g_settings.get('client-version')
-
-  if serverSelector:isOption(server) then
-    serverSelector:setCurrentOption(server, false)
-    if Servers == nil or Servers[server] == nil then
-      serverHostTextEdit:setText(host)
-    end
-    clientVersionSelector:setOption(clientVersion)
-  else
-    server = ""
-    host = ""
+  
+  -- Set textbox background colors
+  local accountNameTextEdit = enterGame:getChildById('accountNameTextEdit')
+  local accountPasswordTextEdit = enterGame:getChildById('accountPasswordTextEdit')
+  if accountNameTextEdit then
+    accountNameTextEdit:setBackgroundColor('#493E38')
+    accountNameTextEdit:setImageSource('')
+  end
+  if accountPasswordTextEdit then
+    accountPasswordTextEdit:setBackgroundColor('#493E38')
+    accountPasswordTextEdit:setImageSource('')
   end
   
-  enterGame:getChildById('accountPasswordTextEdit'):setText(password)
-  enterGame:getChildById('accountNameTextEdit'):setText(account)
+  accountPasswordTextEdit:setText(password)
+  accountNameTextEdit:setText(account)
   rememberPasswordBox:setChecked(#account > 0)
     
   g_keyboard.bindKeyDown('Ctrl+G', EnterGame.openWindow)
+  
+  -- Create fullscreen status label in bottom left corner
+  local rootWidget = g_ui.getRootWidget()
+  fullscreenStatusLabel = g_ui.createWidget('UILabel', rootWidget)
+  fullscreenStatusLabel:setId('fullscreenStatusLabel')
+  fullscreenStatusLabel:setText('Window OFF')
+  fullscreenStatusLabel:setColor('#888888')
+  fullscreenStatusLabel:setTextAlign(AlignLeft)
+  fullscreenStatusLabel:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+  fullscreenStatusLabel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+  fullscreenStatusLabel:setMarginLeft(5)
+  fullscreenStatusLabel:setMarginBottom(5)
+  fullscreenStatusLabel:setSize({width = 100, height = 20})
+  
+  -- Function to update fullscreen status label
+  local function updateFullscreenStatus()
+    if fullscreenStatusLabel then
+      if g_window.isFullscreen() then
+        fullscreenStatusLabel:setText('Window ON')
+        fullscreenStatusLabel:setColor('#00ff00')
+      else
+        fullscreenStatusLabel:setText('Window OFF')
+        fullscreenStatusLabel:setColor('#888888')
+      end
+    end
+  end
+  
+  -- Toggle for auto-fullscreen on startup (Ctrl+F12) - shortcut to options
+  g_keyboard.bindKeyDown('Ctrl+F12', function()
+    if modules.client_options then
+      local currentValue = modules.client_options.getOption('autoFullscreenOnStartup')
+      modules.client_options.setOption('autoFullscreenOnStartup', not currentValue)
+      if not currentValue then
+        g_logger.info("Auto-fullscreen on startup: ENABLED")
+      else
+        g_logger.info("Auto-fullscreen on startup: DISABLED")
+      end
+    end
+    updateFullscreenStatus()
+  end)
+  
+  -- Update status on window resize/fullscreen change
+  connect(g_window, { onResize = updateFullscreenStatus })
 
   if g_game.isOnline() then
     return EnterGame.hide()
   end
 
+  -- Check if auto-fullscreen is enabled from options
+  local autoFullscreen = false
+  if modules.client_options then
+    autoFullscreen = modules.client_options.getOption('autoFullscreenOnStartup')
+  else
+    -- Fallback to settings if options module not loaded yet
+    autoFullscreen = g_settings.get('autoFullscreenOnStartup', false)
+  end
+  
+  if autoFullscreen then
+    g_window.setFullscreen(true)
+  else
+    g_window.setFullscreen(false)
+  end
+  
+  -- Update status label after a brief delay to ensure fullscreen state is set
+  scheduleEvent(function()
+    updateFullscreenStatus()
+  end, 200)
+
+  -- Wait 1 second before showing login window with animation
   scheduleEvent(function()
     EnterGame.show()
-  end, 100)
+  end, 1000)
 end
 
 function EnterGame.terminate()
   if not enterGame then return end
   g_keyboard.unbindKeyDown('Ctrl+G')
+  g_keyboard.unbindKeyDown('Ctrl+F12')
+  
+  if fullscreenStatusLabel then
+    fullscreenStatusLabel:destroy()
+    fullscreenStatusLabel = nil
+  end
   
   enterGame:destroy()
   if loadBox then
@@ -373,10 +516,74 @@ end
 
 function EnterGame.show()
   if not enterGame then return end
+  
+  -- Animation: slide from bottom (fade already happened during the 1 second wait)
+  local screenHeight = g_window.getHeight()
+  local windowHeight = enterGame:getHeight()
+  local finalY = math.floor((screenHeight - windowHeight) / 2)  -- Center position
+  local startY = screenHeight + 100  -- Start from bottom (off-screen)
+  
+  -- Hide window first, then configure position
+  enterGame:hide()
+  
+  -- Temporarily remove center anchor and set initial position
+  enterGame:breakAnchors()
+  enterGame:setY(startY)
+  enterGame:setX(math.floor((g_window.getWidth() - enterGame:getWidth()) / 2))  -- Center horizontally
+  enterGame:setOpacity(1)
+  
+  -- Ensure background image is visible when window is shown
+  local backgroundImage = EnterGame.backgroundImage or enterGame:getChildById('backgroundImage')
+  if backgroundImage then
+    -- Update the image when window becomes visible
+    scheduleEvent(function()
+      -- Re-run update function now that window is visible
+      if EnterGame.updateBackgroundImage then
+        EnterGame.updateBackgroundImage()
+      end
+      backgroundImage:show()
+      backgroundImage:setVisible(true)
+      backgroundImage:lower()
+    end, 50)
+  end
+  
+  -- Now show and start animation
   enterGame:show()
   enterGame:raise()
   enterGame:focus()
-  enterGame:getChildById('accountNameTextEdit'):focus()
+  
+    -- Animate to final position with smooth easing
+    local animationTime = 800  -- milliseconds (increased for smoother animation)
+    local stepInterval = 16  -- ~60fps for maximum smoothness
+    local steps = math.ceil(animationTime / stepInterval)
+    local totalDistance = startY - finalY
+    local currentStep = 0
+    
+    local function easeOutCubic(t)
+      return 1 - math.pow(1 - t, 3)  -- Easing function for smooth deceleration
+    end
+    
+    local function animateSlide()
+      currentStep = currentStep + 1
+      local progress = currentStep / steps
+      
+      -- Apply easing for smooth deceleration
+      local easedProgress = easeOutCubic(progress)
+      local currentY = startY - (totalDistance * easedProgress)
+      
+      if currentStep >= steps then
+        enterGame:setY(finalY)  -- Ensure final position
+        -- Restore center anchor
+        enterGame:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
+        enterGame:addAnchor(AnchorVerticalCenter, 'parent', AnchorVerticalCenter)
+        enterGame:getChildById('accountNameTextEdit'):focus()
+      else
+        enterGame:setY(currentY)
+        scheduleEvent(animateSlide, stepInterval)
+      end
+    end
+    
+    scheduleEvent(animateSlide, stepInterval)
 end
 
 function EnterGame.hide()
@@ -395,30 +602,37 @@ end
 function EnterGame.clearAccountFields()
   enterGame:getChildById('accountNameTextEdit'):clearText()
   enterGame:getChildById('accountPasswordTextEdit'):clearText()
-  enterGame:getChildById('accountTokenTextEdit'):clearText()
   enterGame:getChildById('accountNameTextEdit'):focus()
   g_settings.remove('account')
   g_settings.remove('password')
 end
 
 function EnterGame.onServerChange()
-  server = serverSelector:getText()
-  if server == tr("Another") then
-    if not customServerSelectorPanel:isOn() then
-      serverHostTextEdit:setText("")
-      customServerSelectorPanel:setOn(true)  
-      enterGame:setHeight(enterGame:getHeight() + customServerSelectorPanel:getHeight())
-    end
-  elseif customServerSelectorPanel:isOn() then
-    enterGame:setHeight(enterGame:getHeight() - customServerSelectorPanel:getHeight())
-    customServerSelectorPanel:setOn(false)
+  -- Not used anymore, IP and Version are fixed
+end
+
+function EnterGame.onLoginButtonHover(widget)
+  -- Reset animation before changing image to ensure it starts from the beginning
+  widget:resetImageAnimation()
+  
+  if widget:isHovered() then
+    widget:setImageSource('/images/landcore/loginhover')
+  else
+    widget:setImageSource('/images/landcore/login')
   end
-  if Servers and Servers[server] ~= nil then
-    if type(Servers[server]) == "table" then
-      serverHostTextEdit:setText(Servers[server][1])
-    else
-      serverHostTextEdit:setText(Servers[server])
-    end
+end
+
+function EnterGame.onLoginButtonPress(widget)
+  widget:setImageSource('/images/landcore/loginclick')
+end
+
+function EnterGame.onLoginButtonRelease(widget)
+  widget:resetImageAnimation()
+  
+  if widget:isHovered() then
+    widget:setImageSource('/images/landcore/loginhover')
+  else
+    widget:setImageSource('/images/landcore/login')
   end
 end
 
@@ -431,11 +645,11 @@ function EnterGame.doLogin(account, password, token, host)
   
   G.account = account or enterGame:getChildById('accountNameTextEdit'):getText()
   G.password = password or enterGame:getChildById('accountPasswordTextEdit'):getText()
-  G.authenticatorToken = token or enterGame:getChildById('accountTokenTextEdit'):getText()
+  G.authenticatorToken = token or ""
   G.stayLogged = true
-  G.server = serverSelector:getText():trim()
-  G.host = host or serverHostTextEdit:getText()
-  G.clientVersion = tonumber(clientVersionSelector:getText())  
+  G.server = ""
+  G.host = host or "127.0.0.1"
+  G.clientVersion = 1098  
  
   if not rememberPasswordBox:isChecked() then
     g_settings.set('account', G.account)
@@ -570,19 +784,8 @@ function EnterGame.doLoginHttp()
     stayloggedin = true
   }
   
-  local server = serverSelector:getText()
-  if Servers and Servers[server] ~= nil then
-    if type(Servers[server]) == "table" then
-      local urls = Servers[server]      
-      waitingForHttpResults = #urls
-      for _, url in ipairs(urls) do
-        HTTP.postJSON(url, data, onHTTPResult)
-      end
-    else
-      waitingForHttpResults = 1
-      HTTP.postJSON(G.host, data, onHTTPResult)    
-    end
-  end
+  waitingForHttpResults = 1
+  HTTP.postJSON(G.host, data, onHTTPResult)
   EnterGame.hide()
 end
 

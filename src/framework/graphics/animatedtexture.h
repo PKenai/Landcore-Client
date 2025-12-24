@@ -34,6 +34,7 @@ public:
 
     void replace(const ImagePtr& image) { }
     void update();
+    void resetAnimation();
 
     virtual bool isAnimatedTexture() { return true; }
 

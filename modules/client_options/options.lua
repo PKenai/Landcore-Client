@@ -4,6 +4,7 @@ local defaultOptions = {
   showFps = true,
   showPing = true,
   fullscreen = false,
+  autoFullscreenOnStartup = false,
   classicView = not g_app.isMobile(),
   cacheMap = g_app.isMobile(),
   classicControl = not g_app.isMobile(),
@@ -253,6 +254,9 @@ function setOption(key, value, force)
     end
   elseif key == 'fullscreen' then
     g_window.setFullscreen(value)
+  elseif key == 'autoFullscreenOnStartup' then
+    -- This option is saved but doesn't need runtime action
+    -- It only affects startup behavior
   elseif key == 'enableAudio' then
     if g_sounds ~= nil then
       g_sounds.setAudioEnabled(value)

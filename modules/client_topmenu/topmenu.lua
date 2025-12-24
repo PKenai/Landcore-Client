@@ -47,7 +47,8 @@ function init()
                     onGameEnd = offline,
                     onPingBack = updatePing })
 
-  topMenu = g_ui.createWidget('TopMenu', g_ui.getRootWidget())  
+  topMenu = g_ui.createWidget('TopMenu', g_ui.getRootWidget())
+  topMenu:hide() -- Hide topmenu by default
   g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
   
   if g_game.isOnline() then

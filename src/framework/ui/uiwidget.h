@@ -457,6 +457,7 @@ public:
     void setQRCode(const std::string& code, int border);
     void setImageSource(const std::string& source);
     void setImageSourceBase64(const std::string & data);
+    void resetImageAnimation();
     void setImageClip(const Rect& clipRect) { m_imageClipRect = clipRect; updateImageCache(); }
     void setImageOffsetX(int x) { m_imageRect.setX(x); updateImageCache(); }
     void setImageOffsetY(int y) { m_imageRect.setY(y); updateImageCache(); }

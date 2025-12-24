@@ -25,6 +25,7 @@
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/graphics.h>
 #include <framework/util/crypt.h>
 
@@ -245,4 +246,12 @@ void UIWidget::setImageSourceBase64(const std::string& data) {
     }
 
     m_imageMustRecache = true;
+}
+
+void UIWidget::resetImageAnimation()
+{
+    if(m_imageTexture && m_imageTexture->isAnimatedTexture()) {
+        AnimatedTexture* animTexture = static_cast<AnimatedTexture*>(m_imageTexture.get());
+        animTexture->resetAnimation();
+    }
 }
