@@ -3396,16 +3396,36 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, bool ignoreMount)
     }
 
     if (!ignoreMount) {
+        // Always read mount to maintain protocol alignment (even if feature not enabled)
+        uint16_t mount = 0;
         if (g_game.getFeature(Otc::GamePlayerMounts)) {
-            outfit.setMount(msg->getU16());
+            mount = msg->getU16();
+            outfit.setMount(mount);
+        } else {
+            // Still read but don't use if feature not enabled
+            mount = msg->getU16();
         }
+        
+        // Always read wings/aura to maintain protocol alignment (even if feature not enabled)
+        uint16_t wings = 0, aura = 0;
         if (g_game.getFeature(Otc::GameWingsAndAura)) {
-            outfit.setWings(msg->getU16());
-            outfit.setAura(msg->getU16());
+            wings = msg->getU16();
+            aura = msg->getU16();
+            outfit.setWings(wings);
+            outfit.setAura(aura);
+        } else {
+            // Still read but don't use if feature not enabled
+            wings = msg->getU16();
+            aura = msg->getU16();
         }
-        if (g_game.getFeature(Otc::GameOutfitShaders)) {
-            outfit.setShader(msg->getString());
+        
+        // Always read shader to maintain protocol alignment (even if feature not enabled)
+        std::string shader = msg->getString();
+        // Always set shader if it was sent by server (regardless of feature being enabled)
+        if (!shader.empty()) {
+            outfit.setShader(shader);
         }
+        
         if (g_game.getFeature(Otc::GameHealthInfoBackground)) {
             outfit.setHealthBar(msg->getU16());
             outfit.setManaBar(msg->getU16());

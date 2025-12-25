@@ -491,12 +491,6 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         else
           menu:addOption(tr('Stop Attack'), function() g_game.cancelAttack() end, shortcut)
         end
-
-        if g_game.getFollowingCreature() ~= creatureThing then
-          menu:addOption(tr('Follow'), function() g_game.follow(creatureThing) end)
-        else
-          menu:addOption(tr('Stop Follow'), function() g_game.cancelFollow() end)
-        end
       end
 
       if creatureThing:isPlayer() then
@@ -623,17 +617,6 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
       elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
         resetLeftActions()
         g_game.attack(creatureThing)
-        return true
-      end
-      return true
-    elseif action == "follow" then
-      if attackCreature and attackCreature ~= player then
-        resetLeftActions()
-        g_game.follow(attackCreature)
-        return true
-      elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
-        resetLeftActions()
-        g_game.follow(creatureThing)
         return true
       end
       return true
@@ -1127,21 +1110,6 @@ function setupLeftActions()
         g_game.attack(child.creature)
       else
         g_game.attack(nil)
-      end
-    end
-  end
-  if gameLeftActions.follow then
-    gameLeftActions.follow.doubleClickAction = function()
-      local battlePanel = modules.game_battle.battlePanel
-      local attackedCreature = g_game.getAttackingCreature()
-      local child = battlePanel:getFirstChild()
-      if child and (not child.creature or not child:isOn()) then
-        child = nil
-      end
-      if child then
-        g_game.follow(child.creature)
-      else
-        g_game.follow(nil)
       end
     end
   end

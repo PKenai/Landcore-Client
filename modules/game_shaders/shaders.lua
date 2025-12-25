@@ -23,6 +23,8 @@ function init()
   g_shaders.createOutfitShader("frostknock1novice_shader", "/shaders/outfit_frostknock1novice_shader_vertex", "/shaders/outfit_frostknock1novice_shader_fragment")
   g_shaders.addTexture("frostknock1novice_shader", "/images/shaders/stone.png")
 
+  g_shaders.createOutfitShader("stoneskin1novice_shader", "/shaders/outfit_stoneskin1novice_shader_vertex", "/shaders/outfit_stoneskin1novice_shader_fragment")
+
   -- you can use creature:setOutfitShader("outfit_rainbow") to set shader
   -- you can use creature:setOutfitShader("outfit_golden") to set golden shader
   -- you can use creature:setOutfitShader("frostknock1novice_shader") to set blue frost shader

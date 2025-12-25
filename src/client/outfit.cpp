@@ -283,15 +283,6 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
     Point center;
     bool centerCalculated = false;
     
-    // Log apenas quando shader muda (não a cada frame)
-    static std::string lastLoggedShader = "";
-    if (m_shader != lastLoggedShader) {
-        g_logger.info(stdext::format("[OUTFIT] Shader changed: '%s' -> '%s' (lookType=%d)", 
-            lastLoggedShader.empty() ? "none" : lastLoggedShader.c_str(),
-            m_shader.empty() ? "none" : m_shader.c_str(), m_id));
-        lastLoggedShader = m_shader;
-    }
-    
     for (int yPattern = 0; yPattern < type->getNumPatternY(); yPattern++) {
         bool isAddon = yPattern > 0;
         bool hasAddon = isAddon && (getAddons() & (1 << (yPattern - 1)));
@@ -353,16 +344,7 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
                 // Check if paperdoll item has addons (yPattern > 0)
                 int numPatternY = paperdollType->getNumPatternY();
                 
-                // Log apenas quando shader muda ou quando falha pela primeira vez
-                static std::string lastPaperdollShader = "";
                 static std::map<std::string, bool> loggedFailures;
-                if (m_shader != lastPaperdollShader) {
-                    g_logger.info(stdext::format("[PAPERDOLL] Shader changed: '%s' -> '%s'", 
-                        lastPaperdollShader.empty() ? "none" : lastPaperdollShader.c_str(),
-                        m_shader.empty() ? "none" : m_shader.c_str()));
-                    lastPaperdollShader = m_shader;
-                    loggedFailures.clear(); // Reset failures when shader changes
-                }
                 
                 // Render all yPatterns for paperdoll items (base + potential addons)
                 Point paperdollCenter;

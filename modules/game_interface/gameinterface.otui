@@ -73,9 +73,6 @@ UIWidget
       id: attack
       @onSetup: self.image:setImageSource("/images/game/mobile/attack")
     GameAction
-      id: follow
-      @onSetup: self.image:setImageSource("/images/game/mobile/follow")
-    GameAction
       id: look
       @onSetup: self.image:setImageSource("/images/game/mobile/look")
     GameAction

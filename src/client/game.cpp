@@ -981,6 +981,15 @@ void Game::attack(CreaturePtr creature, bool cancel)
 
 void Game::follow(CreaturePtr creature)
 {
+    // Follow functionality disabled - players must walk manually
+    m_denyBotCall = true;
+    if(isFollowing()) {
+        setFollowingCreature(nullptr);
+    }
+    return;
+    
+    // Original follow code disabled:
+    /*
     m_denyBotCall = false;
     if (!canPerformGameAction() || creature == m_localPlayer) {
         m_denyBotCall = true;
@@ -1005,6 +1014,7 @@ void Game::follow(CreaturePtr creature)
 
     m_protocolGame->sendFollow(creature ? creature->getId() : 0, m_seq);
     m_denyBotCall = true;
+    */
 }
 
 void Game::cancelAttackAndFollow()

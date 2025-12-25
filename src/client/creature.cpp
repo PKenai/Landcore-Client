@@ -703,35 +703,40 @@ void Creature::setOutfit(const Outfit& outfit)
         if (outfit.getId() > 0 && !g_things.isValidDatId(outfit.getId(), ThingCategoryCreature))
             return;
         
-        // Handle shader: preserve shader when outfit changes (addons, paperdoll, etc.)
-        // Only remove shader when explicitly set to empty via Lua
-        std::string newShader = outfit.getShader();
+        // Handle shader: if shader comes from server, always use it
+        // For players, preserve shader when outfit changes (addons, paperdoll, etc.)
+        std::string shaderFromServer = outfit.getShader();
+        bool isPlayer = this->isPlayer();
+        std::string finalShader = "";
         
-        // Check if outfit changed in any way (not just ID)
-        bool outfitChanged = (outfit.getId() != m_outfit.getId() || 
-                            outfit.getAuxId() != m_outfit.getAuxId() ||
-                            outfit.getAddons() != m_outfit.getAddons() ||
-                            outfit.getHair() != m_outfit.getHair() ||
-                            outfit.getArmor() != m_outfit.getArmor() ||
-                            outfit.getHelmet() != m_outfit.getHelmet() ||
-                            outfit.getRightHand() != m_outfit.getRightHand() ||
-                            outfit.getLeftHand() != m_outfit.getLeftHand() ||
-                            outfit.getBoots() != m_outfit.getBoots() ||
-                            outfit.getPants() != m_outfit.getPants() ||
-                            outfit.getShirt() != m_outfit.getShirt());
-        
-        // If newShader is explicitly set (not empty), always use it
-        if (!newShader.empty()) {
-            // New shader is set, use it
-        } else if (newShader.empty() && !preservedShader.empty()) {
-            // Shader is empty in new outfit
+        // If shader comes from server (not empty), always use it (for all creatures)
+        if (!shaderFromServer.empty()) {
+            // Server sent a shader, use it directly for all creatures
+            finalShader = shaderFromServer;
+        } else if (isPlayer && !preservedShader.empty()) {
+            // For players only: preserve shader when outfit changes
+            bool outfitChanged = (outfit.getId() != m_outfit.getId() || 
+                                outfit.getAuxId() != m_outfit.getAuxId() ||
+                                outfit.getAddons() != m_outfit.getAddons() ||
+                                outfit.getHair() != m_outfit.getHair() ||
+                                outfit.getArmor() != m_outfit.getArmor() ||
+                                outfit.getHelmet() != m_outfit.getHelmet() ||
+                                outfit.getRightHand() != m_outfit.getRightHand() ||
+                                outfit.getLeftHand() != m_outfit.getLeftHand() ||
+                                outfit.getBoots() != m_outfit.getBoots() ||
+                                outfit.getPants() != m_outfit.getPants() ||
+                                outfit.getShirt() != m_outfit.getShirt());
+            
             if (outfitChanged) {
-                // Outfit changed (server update) - preserve existing shader
-                newShader = preservedShader;
+                // Outfit changed (server update) - preserve existing shader for players
+                finalShader = preservedShader;
             } else {
                 // Outfit didn't change - this is likely a Lua call to remove shader
-                newShader = "";
+                finalShader = "";
             }
+        } else {
+            // For non-players or when shader is explicitly empty, use empty shader
+            finalShader = "";
         }
         
         m_outfit = outfit;
@@ -769,8 +774,8 @@ void Creature::setOutfit(const Outfit& outfit)
         m_outfit.setBelt(outfit.getBelt());
         m_outfit.setBeltColor(outfit.getBeltColor());
         
-        // Apply shader (preserved or new)
-        m_outfit.setShader(newShader);
+        // Apply shader (from server or preserved for players)
+        m_outfit.setShader(finalShader);
     }
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
 
