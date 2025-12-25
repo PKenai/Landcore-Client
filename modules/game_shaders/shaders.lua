@@ -1,3 +1,5 @@
+local GameOutfitShaders = 106
+
 function init()
   -- add manually your shaders from /data/shaders
 
@@ -15,7 +17,58 @@ function init()
   g_shaders.createOutfitShader("outfit_rainbow", "/shaders/outfit_rainbow_vertex", "/shaders/outfit_rainbow_fragment")
   g_shaders.addTexture("outfit_rainbow", "/images/shaders/rainbow.png")
 
+  g_shaders.createOutfitShader("outfit_golden", "/shaders/outfit_golden_vertex", "/shaders/outfit_golden_fragment")
+  g_shaders.addTexture("outfit_golden", "/images/shaders/stone.png")
+
+  g_shaders.createOutfitShader("frostknock1novice_shader", "/shaders/outfit_frostknock1novice_shader_vertex", "/shaders/outfit_frostknock1novice_shader_fragment")
+  g_shaders.addTexture("frostknock1novice_shader", "/images/shaders/stone.png")
+
   -- you can use creature:setOutfitShader("outfit_rainbow") to set shader
+  -- you can use creature:setOutfitShader("outfit_golden") to set golden shader
+  -- you can use creature:setOutfitShader("frostknock1novice_shader") to set blue frost shader
+
+  -- Register handler for server extended opcode
+  connect(g_game, {
+    onGameStart = function()
+      if ProtocolGame then
+        ProtocolGame.registerExtendedOpcode(GameOutfitShaders, function(protocol, opcode, buffer)
+          local player = g_game.getLocalPlayer()
+          if player then
+            if buffer == "" then
+              -- Remove shader
+              player:setOutfitShader("")
+            else
+              -- Apply shader
+              player:setOutfitShader(buffer)
+            end
+          end
+        end)
+      end
+    end,
+    onGameEnd = function()
+      if ProtocolGame then
+        ProtocolGame.unregisterExtendedOpcode(GameOutfitShaders)
+      end
+    end
+  })
+
+  -- Register on game start if already online
+  if g_game.isOnline() then
+    if ProtocolGame then
+      ProtocolGame.registerExtendedOpcode(GameOutfitShaders, function(protocol, opcode, buffer)
+        local player = g_game.getLocalPlayer()
+        if player then
+          if buffer == "" then
+            -- Remove shader
+            player:setOutfitShader("")
+          else
+            -- Apply shader
+            player:setOutfitShader(buffer)
+          end
+        end
+      end)
+    end
+  end
 
 end
 

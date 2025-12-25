@@ -32,6 +32,10 @@
 #include <framework/graphics/image.h>
 #include <framework/graphics/framebuffermanager.h>
 #include <framework/graphics/shadermanager.h>
+#include <framework/core/logger.h>
+#include <framework/stdext/stdext.h>
+#include <map>
+#include <string>
 
 Outfit::Outfit()
 {
@@ -277,18 +281,36 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
     }
 
     Point center;
+    bool centerCalculated = false;
+    
+    // Log apenas quando shader muda (não a cada frame)
+    static std::string lastLoggedShader = "";
+    if (m_shader != lastLoggedShader) {
+        g_logger.info(stdext::format("[OUTFIT] Shader changed: '%s' -> '%s' (lookType=%d)", 
+            lastLoggedShader.empty() ? "none" : lastLoggedShader.c_str(),
+            m_shader.empty() ? "none" : m_shader.c_str(), m_id));
+        lastLoggedShader = m_shader;
+    }
+    
     for (int yPattern = 0; yPattern < type->getNumPatternY(); yPattern++) {
-        if (yPattern > 0 && !(getAddons() & (1 << (yPattern - 1)))) {
+        bool isAddon = yPattern > 0;
+        bool hasAddon = isAddon && (getAddons() & (1 << (yPattern - 1)));
+        
+        if (isAddon && !hasAddon) {
             continue;
         }
 
         if (type->getLayers() <= 1) {
             if (!m_shader.empty()) {
                 std::shared_ptr<DrawOutfitParams> outfitParams = type->drawOutfit(dest, 0, direction, yPattern, zPattern, animationPhase, Color::white, lightView);
-                if (!outfitParams)
+                if (!outfitParams) {
                     continue;
-                if (yPattern == 0)
+                }
+                // Calculate center from yPattern 0, use it for all patterns
+                if (!centerCalculated) {
                     center = outfitParams->dest.center();
+                    centerCalculated = true;
+                }
                 DrawQueueItemTexturedRect* outfit = new DrawQueueItemOutfitWithShader(outfitParams->dest, outfitParams->texture, outfitParams->src, outfitParams->offset, center, 0, m_shader, m_center);
                 g_drawQueue->add(outfit);
                 continue;
@@ -299,15 +321,19 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
 
         uint32_t colors = m_head + (m_body << 8) + (m_legs << 16) + (m_feet << 24);
         std::shared_ptr<DrawOutfitParams> outfitParams = type->drawOutfit(dest, 1, direction, yPattern, zPattern, animationPhase, Color::white, lightView);
-        if (!outfitParams)
+        if (!outfitParams) {
             continue;
+        }
 
         DrawQueueItemTexturedRect* outfit = nullptr;
-        if (m_shader.empty())
+        if (m_shader.empty()) {
             outfit = new DrawQueueItemOutfit(outfitParams->dest, outfitParams->texture, outfitParams->src, outfitParams->offset, colors, outfitParams->color, m_center);
-        else {
-            if (yPattern == 0)
+        } else {
+            // Calculate center from yPattern 0, use it for all patterns
+            if (!centerCalculated) {
                 center = outfitParams->dest.center();
+                centerCalculated = true;
+            }
             outfit = new DrawQueueItemOutfitWithShader(outfitParams->dest, outfitParams->texture, outfitParams->src, outfitParams->offset, center, colors, m_shader, m_center);
         }
         g_drawQueue->add(outfit);
@@ -324,14 +350,52 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
                 uint32_t paperdollColor = colorId > 0 ? colorId : 20; // Default color if none specified
                 uint32_t paperdollColors = paperdollColor + (paperdollColor << 8) + (paperdollColor << 16) + (paperdollColor << 24);
                 
-                std::shared_ptr<DrawOutfitParams> paperdollParams = paperdollType->drawOutfit(paperdollDest, 1, direction, 0, 0, animationPhase, Color::white, lightView);
-                if (paperdollParams) {
-                    // Use the outfit color system for proper mask application
-                    DrawQueueItemTexturedRect* paperdollItem = new DrawQueueItemOutfit(paperdollParams->dest, paperdollParams->texture, paperdollParams->src, paperdollParams->offset, paperdollColors, paperdollParams->color, m_center);
-                    g_drawQueue->add(paperdollItem);
-                } else {
-                    // Fallback to simple draw if drawOutfit fails
-                    paperdollType->draw(paperdollDest, 0, direction, 0, 0, animationPhase, Color::white, lightView);
+                // Check if paperdoll item has addons (yPattern > 0)
+                int numPatternY = paperdollType->getNumPatternY();
+                
+                // Log apenas quando shader muda ou quando falha pela primeira vez
+                static std::string lastPaperdollShader = "";
+                static std::map<std::string, bool> loggedFailures;
+                if (m_shader != lastPaperdollShader) {
+                    g_logger.info(stdext::format("[PAPERDOLL] Shader changed: '%s' -> '%s'", 
+                        lastPaperdollShader.empty() ? "none" : lastPaperdollShader.c_str(),
+                        m_shader.empty() ? "none" : m_shader.c_str()));
+                    lastPaperdollShader = m_shader;
+                    loggedFailures.clear(); // Reset failures when shader changes
+                }
+                
+                // Render all yPatterns for paperdoll items (base + potential addons)
+                Point paperdollCenter;
+                bool centerCalculated = false;
+                // Determine the correct layer for paperdoll items (similar to outfit base)
+                int paperdollLayer = paperdollType->getLayers() <= 1 ? 0 : 1;
+                for (int yPattern = 0; yPattern < numPatternY; yPattern++) {
+                    std::shared_ptr<DrawOutfitParams> paperdollParams = paperdollType->drawOutfit(paperdollDest, paperdollLayer, direction, yPattern, 0, animationPhase, Color::white, lightView);
+                    if (paperdollParams) {
+                        // Use shader if available, otherwise use normal outfit rendering
+                        DrawQueueItemTexturedRect* paperdollItem = nullptr;
+                        if (m_shader.empty()) {
+                            // Use the outfit color system for proper mask application
+                            paperdollItem = new DrawQueueItemOutfit(paperdollParams->dest, paperdollParams->texture, paperdollParams->src, paperdollParams->offset, paperdollColors, paperdollParams->color, m_center);
+                        } else {
+                            // Apply shader to paperdoll parts
+                            if (!centerCalculated) {
+                                paperdollCenter = paperdollParams->dest.center();
+                                centerCalculated = true;
+                            }
+                            paperdollItem = new DrawQueueItemOutfitWithShader(paperdollParams->dest, paperdollParams->texture, paperdollParams->src, paperdollParams->offset, paperdollCenter, paperdollColors, m_shader, m_center);
+                        }
+                        g_drawQueue->add(paperdollItem);
+                    } else {
+                        // Log apenas uma vez quando falha
+                        if (loggedFailures.find(partName) == loggedFailures.end()) {
+                            g_logger.warning(stdext::format("[PAPERDOLL] Failed: %s, lookType=%d, layer=%d, shader=%s", 
+                                partName, lookType, paperdollLayer, m_shader.empty() ? "none" : m_shader.c_str()));
+                            loggedFailures[partName] = true;
+                        }
+                        // Fallback to simple draw if drawOutfit fails
+                        paperdollType->draw(paperdollDest, 0, direction, yPattern, 0, animationPhase, Color::white, lightView);
+                    }
                 }
             }
         }
@@ -497,6 +561,7 @@ void DrawQueueItemOutfitWithShader::draw()
     g_painter->setOffset(m_offset);
     shader->setMatrixColor(mat4);
     shader->setCenter(m_center);
+    shader->updateTime(); // Atualiza o u_Time para animação
     shader->bindMultiTextures();
     if (useFramebuffer) {
         g_painter->drawTexturedRect(Rect(0, 0, m_src.size()), m_texture, m_src);

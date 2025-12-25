@@ -44,6 +44,8 @@
 
 #include <framework/util/stats.h>
 #include <framework/util/extras.h>
+#include <framework/core/logger.h>
+#include <framework/stdext/stdext.h>
 
 std::array<double, Otc::LastSpeedFormula> Creature::m_speedFormula = { -1,-1,-1 };
 
@@ -687,6 +689,9 @@ void Creature::setDirection(Otc::Direction direction)
 void Creature::setOutfit(const Outfit& outfit)
 {
     Outfit oldOutfit = m_outfit;
+    // Preserve shader if it was set via Lua/extended opcode
+    std::string preservedShader = m_outfit.getShader();
+    
     if (outfit.getCategory() != ThingCategoryCreature) {
         if (!g_things.isValidDatId(outfit.getAuxId(), outfit.getCategory()))
             return;
@@ -697,6 +702,38 @@ void Creature::setOutfit(const Outfit& outfit)
     } else {
         if (outfit.getId() > 0 && !g_things.isValidDatId(outfit.getId(), ThingCategoryCreature))
             return;
+        
+        // Handle shader: preserve shader when outfit changes (addons, paperdoll, etc.)
+        // Only remove shader when explicitly set to empty via Lua
+        std::string newShader = outfit.getShader();
+        
+        // Check if outfit changed in any way (not just ID)
+        bool outfitChanged = (outfit.getId() != m_outfit.getId() || 
+                            outfit.getAuxId() != m_outfit.getAuxId() ||
+                            outfit.getAddons() != m_outfit.getAddons() ||
+                            outfit.getHair() != m_outfit.getHair() ||
+                            outfit.getArmor() != m_outfit.getArmor() ||
+                            outfit.getHelmet() != m_outfit.getHelmet() ||
+                            outfit.getRightHand() != m_outfit.getRightHand() ||
+                            outfit.getLeftHand() != m_outfit.getLeftHand() ||
+                            outfit.getBoots() != m_outfit.getBoots() ||
+                            outfit.getPants() != m_outfit.getPants() ||
+                            outfit.getShirt() != m_outfit.getShirt());
+        
+        // If newShader is explicitly set (not empty), always use it
+        if (!newShader.empty()) {
+            // New shader is set, use it
+        } else if (newShader.empty() && !preservedShader.empty()) {
+            // Shader is empty in new outfit
+            if (outfitChanged) {
+                // Outfit changed (server update) - preserve existing shader
+                newShader = preservedShader;
+            } else {
+                // Outfit didn't change - this is likely a Lua call to remove shader
+                newShader = "";
+            }
+        }
+        
         m_outfit = outfit;
         
         // Copy all paperdoll parts regardless of category
@@ -731,6 +768,9 @@ void Creature::setOutfit(const Outfit& outfit)
         m_outfit.setGlovesColor(outfit.getGlovesColor());
         m_outfit.setBelt(outfit.getBelt());
         m_outfit.setBeltColor(outfit.getBeltColor());
+        
+        // Apply shader (preserved or new)
+        m_outfit.setShader(newShader);
     }
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
 
