@@ -1,0 +1,155 @@
+UnifiedInventoryWindow < UIWindow
+  id: unifiedInventoryWindow
+  !text: tr('Unified Inventory')
+  size: 420 700
+  @onClose: modules.game_unified_inventory.onMiniWindowClose()
+  
+  Panel
+    id: mainPanel
+    anchors.fill: parent
+    layout:
+      type: verticalBox
+    padding: 3
+    
+    Panel
+      id: equipmentPanel
+      height: 280
+      padding: 5
+      background-color: #00000088
+      border-width: 1
+      border-color: #333333
+      
+      Panel
+        id: inventoryPanel
+        anchors.fill: parent
+        anchors.margins: 5
+        
+        Item
+          id: slot1
+          anchors.top: parent.top
+          anchors.horizontalCenter: parent.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/head
+
+        Item
+          id: slot4
+          anchors.top: slot1.bottom
+          anchors.horizontalCenter: slot1.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/body
+
+        Item
+          id: slot7
+          anchors.top: slot4.bottom
+          anchors.horizontalCenter: slot4.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/legs
+
+        Item
+          id: slot8
+          anchors.top: slot7.bottom
+          anchors.horizontalCenter: slot7.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/feet
+
+        Item
+          id: slot2
+          anchors.top: slot1.top
+          anchors.right: slot1.left
+          margin-top: 13
+          margin-right: 5
+          image-source: /images/game/slots/neck
+
+        Item
+          id: slot6
+          anchors.top: slot2.bottom
+          anchors.horizontalCenter: slot2.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/left-hand
+
+        Item
+          id: slot9
+          anchors.top: slot6.bottom
+          anchors.horizontalCenter: slot6.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/finger
+          
+        Item
+          id: slot3
+          anchors.top: slot1.top
+          anchors.left: slot1.right
+          margin-top: 13
+          margin-left: 5
+          image-source: /images/game/slots/back
+
+        Item
+          id: slot5
+          anchors.top: slot3.bottom
+          anchors.horizontalCenter: slot3.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/right-hand
+
+        Item
+          id: slot10
+          anchors.top: slot5.bottom
+          anchors.horizontalCenter: slot5.horizontalCenter
+          margin-top: 3
+          image-source: /images/game/slots/ammo
+    
+    Panel
+      height: 2
+      background-color: #555555
+      margin-top: 2
+      margin-bottom: 2
+    
+    Panel
+      id: favoritesContainer
+      height: 50
+      padding: 3
+      background-color: #1a1a1a88
+      border-width: 1
+      border-color: #444444
+      
+      Label
+        anchors.top: parent.top
+        anchors.left: parent.left
+        margin-left: 3
+        margin-top: 2
+        text: tr('Favorites')
+        font: verdana-11px-antialised
+        color: #FFFF00
+      
+      Panel
+        id: favoritesPanel
+        anchors.fill: parent
+        anchors.top: prev.bottom
+        margin-top: 2
+        layout:
+          type: grid
+          cell-size: 34 34
+          flow: true
+          num-columns: 8
+    
+    Panel
+      height: 2
+      background-color: #555555
+      margin-top: 2
+      margin-bottom: 2
+    
+    Panel
+      id: backpackContainer
+      size: 0 0
+      padding: 3
+      background-color: #00000088
+      border-width: 1
+      border-color: #333333
+      
+      Panel
+        id: backpackPanel
+        anchors.fill: parent
+        anchors.margins: 3
+        layout:
+          type: grid
+          cell-size: 34 34
+          flow: true
+          num-columns: 8

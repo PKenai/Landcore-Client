@@ -1,0 +1,9 @@
+Module
+  name: game_unified_inventory
+  description: Unified inventory window with equipment slots and large backpack
+  author: Landcore
+  sandboxed: true
+  scripts: [ unified_inventory ]
+  @onLoad: init()
+  @onUnload: terminate()
+
