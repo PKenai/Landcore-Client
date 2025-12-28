@@ -30,6 +30,9 @@
 #include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/drawqueue.h>
+#include <framework/graphics/shadermanager.h>
+#include <framework/graphics/image.h>
 
 void UIWidget::initBaseStyle()
 {
@@ -102,6 +105,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setBackgroundSize(node->value<Size>());
         else if(node->tag() == "background-rect")
             setBackgroundRect(node->value<Rect>());
+        else if(node->tag() == "background-shader")
+            setBackgroundShader(node->value());
         else if(node->tag() == "icon")
             setIcon(stdext::resolve_path(node->value(), node->source()));
         else if(node->tag() == "icon-source")
@@ -346,7 +351,13 @@ void UIWidget::drawBackground(const Rect& screenCoords)
         drawRect.translate(m_backgroundRect.topLeft());
         if(m_backgroundRect.isValid())
             drawRect.resize(m_backgroundRect.size());
-        g_drawQueue->addFilledRect(drawRect, m_backgroundColor);
+        
+        if (!m_backgroundShader.empty()) {
+            DrawQueueItemFilledRectWithShader* item = new DrawQueueItemFilledRectWithShader(drawRect, m_backgroundColor, m_backgroundShader);
+            g_drawQueue->add(item);
+        } else {
+            g_drawQueue->addFilledRect(drawRect, m_backgroundColor);
+        }
     }
 }
 

@@ -8,6 +8,7 @@
 #include <framework/graphics/textrender.h>
 #include <framework/graphics/drawcache.h>
 #include <framework/graphics/image.h>
+#include <framework/graphics/texturemanager.h>
 #include <client/spritemanager.h>
 #include <client/outfit.h>
 
@@ -115,6 +116,47 @@ bool DrawQueueItemFilledRect::cache()
     if (!g_drawCache.hasSpace(6)) return false;
     g_drawCache.addRect(m_dest, m_color);
     return true; 
+}
+
+void DrawQueueItemFilledRectWithShader::draw()
+{
+    if (m_shader.empty()) {
+        // Fallback to normal filled rect if no shader
+        g_painter->setColor(m_color);
+        g_painter->drawFilledRect(m_dest);
+        return;
+    }
+
+    PainterShaderProgramPtr shader = g_shaders.getShader(m_shader);
+    if (!shader) {
+        // Fallback if shader not found
+        g_painter->setColor(m_color);
+        g_painter->drawFilledRect(m_dest);
+        return;
+    }
+
+    // Create a coords buffer for the rectangle with proper texture coordinates
+    CoordsBuffer coordsBuffer;
+    // Add rectangle with normalized texture coordinates (0,0 to 1,1)
+    coordsBuffer.addRect(m_dest, Rect(0, 0, 1, 1));
+
+    // Create a 1x1 white texture for the shader to work with
+    static TexturePtr whiteTexture = nullptr;
+    if (!whiteTexture) {
+        ImagePtr whiteImage = ImagePtr(new Image(Size(1, 1), 4));
+        whiteImage->setPixel(0, 0, Color::white);
+        whiteTexture = TexturePtr(new Texture(whiteImage));
+        whiteTexture->setSmooth(false);
+    }
+
+    g_painter->setShaderProgram(shader);
+    shader->bindMultiTextures();
+    shader->setCenter(m_dest.center());
+    shader->setOffset(m_dest.topLeft());
+    shader->updateTime();
+    g_painter->setColor(m_color);
+    g_painter->drawTextureCoords(coordsBuffer, whiteTexture);
+    g_painter->resetShaderProgram();
 }
 
 void DrawQueueItemClearRect::draw()

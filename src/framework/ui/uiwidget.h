@@ -303,6 +303,7 @@ protected:
     Color m_color;
     Color m_backgroundColor;
     Rect m_backgroundRect;
+    std::string m_backgroundShader;
     TexturePtr m_icon;
     Color m_iconColor;
     Rect m_iconRect;
@@ -335,6 +336,7 @@ public:
     void setBackgroundHeight(int height) { m_backgroundRect.setHeight(height); }
     void setBackgroundSize(const Size& size) { m_backgroundRect.resize(size); }
     void setBackgroundRect(const Rect& rect) { m_backgroundRect = rect; }
+    void setBackgroundShader(const std::string& str) { m_backgroundShader = str; }
     void setIcon(const std::string& iconFile);
     void setIconColor(const Color& color) { m_iconColor = color; }
     void setIconOffsetX(int x) { m_iconOffset.x = x; }
@@ -391,6 +393,7 @@ public:
     int getBackgroundHeight() { return m_backgroundRect.height(); }
     Size getBackgroundSize() { return m_backgroundRect.size(); }
     Rect getBackgroundRect() { return m_backgroundRect; }
+    std::string getBackgroundShader() { return m_backgroundShader; }
     Color getIconColor() { return m_iconColor; }
     int getIconOffsetX() { return m_iconOffset.x; }
     int getIconOffsetY() { return m_iconOffset.y; }

@@ -864,6 +864,15 @@ function toggle()
   end
   
   if unifiedInventoryButton:isOn() then
+    -- Remove shader when closing
+    local backgroundImage = unifiedInventoryWindow:getChildById('backgroundImage')
+    if backgroundImage then
+      if backgroundImage.setImageShader then
+        backgroundImage:setImageShader("")
+      elseif backgroundImage.setBackgroundShader then
+        backgroundImage:setBackgroundShader("")
+      end
+    end
     unifiedInventoryWindow:hide()
     unifiedInventoryButton:setOn(false)
   else
@@ -876,10 +885,67 @@ function toggle()
         unifiedInventoryWindow:setMarginTop(60)
       end
       
+      -- Start fade in animation (like minimap)
+      unifiedInventoryWindow:setOpacity(0)
       unifiedInventoryWindow:setVisible(true)
       unifiedInventoryWindow:show()
       unifiedInventoryWindow:raise()
       unifiedInventoryWindow:focus()
+      
+      -- Apply shader to backgroundImage (on top of the background image)
+      scheduleEvent(function()
+        local backgroundImage = unifiedInventoryWindow:getChildById('backgroundImage')
+        if backgroundImage then
+          -- Apply shader to the image itself (using ui_blood shader optimized for UI widgets)
+          if backgroundImage.setImageShader then
+            backgroundImage:setImageShader("ui_blood")
+          -- Fallback to background shader if image shader doesn't exist
+          elseif backgroundImage.setBackgroundShader then
+            backgroundImage:setBackgroundShader("ui_blood")
+            if backgroundImage.setBackgroundColor then
+              backgroundImage:setBackgroundColor("#000000")
+            end
+          end
+        end
+      end, 10)
+      
+      -- Fade in animation
+      local fadeDuration = 300  -- 300ms fade duration
+      local startTime = g_clock.millis()
+      local startOpacity = 0
+      local targetOpacity = 1.0
+      local steps = 30
+      local stepDuration = fadeDuration / steps
+      
+      -- Easing function for smooth animation (ease-in-out)
+      local function easeInOut(t)
+        return t * t * (3.0 - 2.0 * t)
+      end
+      
+      local function animate()
+        if not unifiedInventoryWindow or not unifiedInventoryWindow:isVisible() then
+          return  -- Stop if window was closed
+        end
+        
+        local elapsed = g_clock.millis() - startTime
+        local progress = math.min(elapsed / fadeDuration, 1.0)
+        
+        -- Apply easing for smooth animation
+        local easedProgress = easeInOut(progress)
+        
+        -- Interpolate opacity with easing
+        local currentOpacity = startOpacity + (targetOpacity - startOpacity) * easedProgress
+        unifiedInventoryWindow:setOpacity(currentOpacity)
+        
+        if progress < 1.0 then
+          scheduleEvent(animate, stepDuration)
+        else
+          -- Ensure full opacity at the end
+          unifiedInventoryWindow:setOpacity(1.0)
+        end
+      end
+      
+      scheduleEvent(animate, stepDuration)
       
       -- Force update slot 0 visibility when opening window
       scheduleEvent(function()
@@ -925,6 +991,18 @@ function toggle()
 end
 
 function onMiniWindowClose()
+  -- Remove shader when closing
+  if unifiedInventoryWindow then
+    local backgroundImage = unifiedInventoryWindow:getChildById('backgroundImage')
+    if backgroundImage then
+      if backgroundImage.setImageShader then
+        backgroundImage:setImageShader("")
+      elseif backgroundImage.setBackgroundShader then
+        backgroundImage:setBackgroundShader("")
+      end
+    end
+  end
+  
   if unifiedInventoryButton then
     unifiedInventoryButton:setOn(false)
   end

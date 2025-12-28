@@ -630,6 +630,8 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getBackgroundHeight", &UIWidget::getBackgroundHeight);
     g_lua.bindClassMemberFunction<UIWidget>("getBackgroundSize", &UIWidget::getBackgroundSize);
     g_lua.bindClassMemberFunction<UIWidget>("getBackgroundRect", &UIWidget::getBackgroundRect);
+    g_lua.bindClassMemberFunction<UIWidget>("setBackgroundShader", &UIWidget::setBackgroundShader);
+    g_lua.bindClassMemberFunction<UIWidget>("getBackgroundShader", &UIWidget::getBackgroundShader);
     g_lua.bindClassMemberFunction<UIWidget>("getIconColor", &UIWidget::getIconColor);
     g_lua.bindClassMemberFunction<UIWidget>("getIconOffsetX", &UIWidget::getIconOffsetX);
     g_lua.bindClassMemberFunction<UIWidget>("getIconOffsetY", &UIWidget::getIconOffsetY);
@@ -699,6 +701,8 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getImageBorderLeft", &UIWidget::getImageBorderLeft);
     g_lua.bindClassMemberFunction<UIWidget>("getImageTextureWidth", &UIWidget::getImageTextureWidth);
     g_lua.bindClassMemberFunction<UIWidget>("getImageTextureHeight", &UIWidget::getImageTextureHeight);
+    g_lua.bindClassMemberFunction<UIWidget>("setImageShader", &UIWidget::setImageShader);
+    g_lua.bindClassMemberFunction<UIWidget>("getImageShader", &UIWidget::getImageShader);
     g_lua.bindClassMemberFunction<UIWidget>("resizeToText", &UIWidget::resizeToText);
     g_lua.bindClassMemberFunction<UIWidget>("clearText", &UIWidget::clearText);
     g_lua.bindClassMemberFunction<UIWidget>("setText", &UIWidget::setText);

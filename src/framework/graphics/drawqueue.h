@@ -90,6 +90,16 @@ struct DrawQueueItemFilledRect : public DrawQueueItem {
     Rect m_dest;
 };
 
+struct DrawQueueItemFilledRectWithShader : public DrawQueueItem {
+    DrawQueueItemFilledRectWithShader(const Rect& rect, const Color& color, const std::string& shader) :
+        DrawQueueItem(nullptr, color), m_dest(rect), m_shader(shader) {};
+    void draw() override;
+    bool cache() override { return false; }
+
+    Rect m_dest;
+    std::string m_shader;
+};
+
 struct DrawQueueItemClearRect : public DrawQueueItem {
     DrawQueueItemClearRect(const Rect& rect, const Color& color) :
         DrawQueueItem(nullptr, color), m_dest(rect)

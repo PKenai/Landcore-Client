@@ -9,7 +9,14 @@ function init()
   g_shaders.createShader("map_rainbow", "/shaders/map_rainbow_vertex", "/shaders/map_rainbow_fragment")
   g_shaders.addTexture("map_rainbow", "/images/shaders/rainbow.png")
 
+  g_shaders.createShader("map_blood", "/shaders/map_blood_vertex", "/shaders/map_blood_fragment")
+
+  -- UI shaders (for widgets and windows)
+  g_shaders.createShader("ui_blood", "/shaders/ui_blood_vertex", "/shaders/ui_blood_fragment")
+
   -- use modules.game_interface.gameMapPanel:setShader("map_rainbow") to set shader
+  -- use modules.game_interface.gameMapPanel:setShader("map_blood") to set blood shader
+  -- use widget:setImageShader("ui_blood") or widget:setBackgroundShader("ui_blood") for UI widgets
 
   -- outfit shaders
   g_shaders.createOutfitShader("outfit_default", "/shaders/outfit_default_vertex", "/shaders/outfit_default_fragment")
