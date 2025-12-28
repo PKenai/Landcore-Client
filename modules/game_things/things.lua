@@ -10,6 +10,7 @@ function isLoaded()
 end
 
 function load()
+  g_game.enableFeature(GameExtendedOpcode)
   g_game.enableFeature(GameSlowerManualWalking)
   g_game.enableFeature(GameNewUpdateWalk)
   g_game.enableFeature(GameExtendedOpcode)

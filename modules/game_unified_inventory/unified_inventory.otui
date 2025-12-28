@@ -1,8 +1,16 @@
 UnifiedInventoryWindow < UIWindow
   id: unifiedInventoryWindow
-  !text: tr('Unified Inventory')
-  size: 420 700
+  !text: 
+  size: 413 560
   @onClose: modules.game_unified_inventory.onMiniWindowClose()
+  
+  UIWidget
+    id: backgroundImage
+    anchors.centerIn: parent
+    margin-top: -55
+    size: 505 675
+    image-source: /images/landcore/inventory
+    image-auto-resize: false
   
   Panel
     id: mainPanel
@@ -13,11 +21,11 @@ UnifiedInventoryWindow < UIWindow
     
     Panel
       id: equipmentPanel
-      height: 280
+      height: 155
+      margin-top: -25
       padding: 5
-      background-color: #00000088
-      border-width: 1
-      border-color: #333333
+      background-color: #00000000
+      border-width: 0
       
       Panel
         id: inventoryPanel
@@ -30,6 +38,7 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: parent.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/head
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot4
@@ -37,6 +46,7 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: slot1.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/body
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot7
@@ -44,6 +54,7 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: slot4.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/legs
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot8
@@ -51,6 +62,7 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: slot7.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/feet
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot2
@@ -59,6 +71,7 @@ UnifiedInventoryWindow < UIWindow
           margin-top: 13
           margin-right: 5
           image-source: /images/game/slots/neck
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot6
@@ -66,6 +79,7 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: slot2.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/left-hand
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot9
@@ -73,6 +87,7 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: slot6.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/finger
+          background-image: /images/landcore/inventoryicon
           
         Item
           id: slot3
@@ -81,6 +96,7 @@ UnifiedInventoryWindow < UIWindow
           margin-top: 13
           margin-left: 5
           image-source: /images/game/slots/back
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot5
@@ -88,6 +104,7 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: slot3.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/right-hand
+          background-image: /images/landcore/inventoryicon
 
         Item
           id: slot10
@@ -95,20 +112,14 @@ UnifiedInventoryWindow < UIWindow
           anchors.horizontalCenter: slot5.horizontalCenter
           margin-top: 3
           image-source: /images/game/slots/ammo
-    
-    Panel
-      height: 2
-      background-color: #555555
-      margin-top: 2
-      margin-bottom: 2
+          background-image: /images/landcore/inventoryicon
     
     Panel
       id: favoritesContainer
       height: 50
       padding: 3
-      background-color: #1a1a1a88
-      border-width: 1
-      border-color: #444444
+      background-color: #00000000
+      border-width: 0
       
       Label
         anchors.top: parent.top
@@ -131,18 +142,11 @@ UnifiedInventoryWindow < UIWindow
           num-columns: 8
     
     Panel
-      height: 2
-      background-color: #555555
-      margin-top: 2
-      margin-bottom: 2
-    
-    Panel
       id: backpackContainer
       size: 0 0
       padding: 3
-      background-color: #00000088
-      border-width: 1
-      border-color: #333333
+      background-color: #00000000
+      border-width: 0
       
       Panel
         id: backpackPanel
