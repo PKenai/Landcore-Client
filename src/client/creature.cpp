@@ -148,7 +148,15 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
         fillColor = m_informationColor;
 
     // calculate main rects - hp/mana
-    Rect backgroundRect = Rect(point.x + m_informationOffset.x - (13.5), point.y + m_informationOffset.y, 27, 4);
+    // Offset especial para o personagem local (37px esquerda, 15px cima)
+    int localPlayerOffsetX = 0;
+    int localPlayerOffsetY = 0;
+    if (isLocalPlayer()) {
+        localPlayerOffsetX = -37;
+        localPlayerOffsetY = -15;
+    }
+    
+    Rect backgroundRect = Rect(point.x + m_informationOffset.x - (15) + localPlayerOffsetX, point.y + m_informationOffset.y + localPlayerOffsetY, 31, 6);
     backgroundRect.bind(parentRect);
 
     //debug            
@@ -163,7 +171,7 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
     }
 
     Size nameSize = m_nameCache.getTextSize();
-    Rect textRect = Rect(point.x + m_informationOffset.x - nameSize.width() / 2.0, point.y + m_informationOffset.y - 12, nameSize);
+    Rect textRect = Rect(point.x + m_informationOffset.x - nameSize.width() / 2.0 + localPlayerOffsetX, point.y + m_informationOffset.y - 12 + localPlayerOffsetY, nameSize);
     textRect.bind(parentRect);
 
     // distance them
@@ -196,7 +204,8 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
 
     // health rect is based on background rect, so no worries
     Rect healthRect = backgroundRect.expanded(-1);
-    healthRect.setWidth((m_healthPercent / 100.0) * 25);
+    int healthBarMaxWidth = backgroundRect.width() - 2;
+    healthRect.setWidth((m_healthPercent / 100.0) * healthBarMaxWidth);
 
     // draw
     if (g_game.getFeature(Otc::GameBlueNpcNameColor) && isNpc() && m_healthPercent == 100 && !useGray)
@@ -208,8 +217,36 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
             Rect barRect = Rect(backgroundRect.x() + healthBar->getOffset().x, backgroundRect.y() + healthBar->getOffset().y, barTexture->getSize());
             g_drawQueue->addTexturedRect(barRect, barTexture, Rect(0, 0, barTexture->getSize()));
         }
-        g_drawQueue->addFilledRect(backgroundRect, Color::black);
-        g_drawQueue->addFilledRect(healthRect, fillColor);
+        
+        // Fundo preto da barra
+        g_drawQueue->addFilledRect(backgroundRect, Color(0x00, 0x00, 0x00));
+        
+        // Barra de vida com efeito de gradiente/curva suave
+        if (healthRect.width() > 0) {
+            // Cor principal da barra
+            g_drawQueue->addFilledRect(healthRect, fillColor);
+            
+            // Linha de highlight no topo (mais clara) - efeito de brilho sutil
+            Rect topHighlight = healthRect;
+            topHighlight.setHeight(1);
+            Color highlightColor = Color(
+                std::min(255, fillColor.r() + 35),
+                std::min(255, fillColor.g() + 35),
+                std::min(255, fillColor.b() + 35)
+            );
+            g_drawQueue->addFilledRect(topHighlight, highlightColor);
+            
+            // Linha de sombra na base (mais escura) - efeito de profundidade sutil
+            Rect bottomShadow = healthRect;
+            bottomShadow.setTop(healthRect.bottom() - 1);
+            bottomShadow.setHeight(1);
+            Color shadowColor = Color(
+                std::max(0, fillColor.r() - 25),
+                std::max(0, fillColor.g() - 25),
+                std::max(0, fillColor.b() - 25)
+            );
+            g_drawQueue->addFilledRect(bottomShadow, shadowColor);
+        }
 
         if (drawFlags & Otc::DrawManaBar) {
             int8 manaPercent = m_manaPercent;
@@ -241,22 +278,42 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
                     Rect barRect = Rect(backgroundRect.x() + manaBar->getOffset().x, backgroundRect.y() + manaBar->getOffset().y, barTexture->getSize());
                     g_drawQueue->addTexturedRect(barRect, barTexture, Rect(0, 0, barTexture->getSize()));
                 }
-                g_drawQueue->addFilledRect(backgroundRect, Color::black);
+                
+                // Fundo preto da barra de mana
+                g_drawQueue->addFilledRect(backgroundRect, Color(0x00, 0x00, 0x00));
 
                 Rect manaRect = backgroundRect.expanded(-1);
-                manaRect.setWidth(((float)manaPercent / 100.f) * 25);
-                g_drawQueue->addFilledRect(manaRect, Color::blue);
+                int manaBarMaxWidth = backgroundRect.width() - 2;
+                manaRect.setWidth(((float)manaPercent / 100.f) * manaBarMaxWidth);
+                
+                // Barra de mana com efeito de gradiente/curva suave
+                if (manaRect.width() > 0) {
+                    Color manaColor = Color(0x00, 0x88, 0xFF);
+                    g_drawQueue->addFilledRect(manaRect, manaColor);
+                    
+                    // Highlight no topo (mais sutil)
+                    Rect manaTopHighlight = manaRect;
+                    manaTopHighlight.setHeight(1);
+                    g_drawQueue->addFilledRect(manaTopHighlight, Color(0x33, 0xA5, 0xFF));
+                    
+                    // Sombra na base (mais sutil)
+                    Rect manaBottomShadow = manaRect;
+                    manaBottomShadow.setTop(manaRect.bottom() - 1);
+                    manaBottomShadow.setHeight(1);
+                    g_drawQueue->addFilledRect(manaBottomShadow, Color(0x00, 0x70, 0xDD));
+                }
             }
         }
 
         if (getProgressBarPercent()) {
             backgroundRect.moveTop(backgroundRect.bottom());
 
-            g_drawQueue->addFilledRect(backgroundRect, Color::black);
+            g_drawQueue->addFilledRect(backgroundRect, Color(0x00, 0x00, 0x00));
 
             Rect progressBarRect = backgroundRect.expanded(-1);
             double maxBar = 100;
-            progressBarRect.setWidth(getProgressBarPercent() / (maxBar * 1.0) * 25);
+            int progressBarMaxWidth = backgroundRect.width() - 2;
+            progressBarRect.setWidth(getProgressBarPercent() / maxBar * progressBarMaxWidth);
 
             g_drawQueue->addFilledRect(progressBarRect, Color::white);
         }
@@ -284,23 +341,23 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
         return;
 
     if (m_skull != Otc::SkullNone && m_skullTexture) {
-        Rect skullRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_skullTexture->getSize());
+        Rect skullRect = Rect(backgroundRect.x() + 15 + 12, backgroundRect.y() + 5, m_skullTexture->getSize());
         g_drawQueue->addTexturedRect(skullRect, m_skullTexture, Rect(0, 0, m_skullTexture->getSize()));
     }
     if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture) {
-        Rect shieldRect = Rect(backgroundRect.x() + 13.5, backgroundRect.y() + 5, m_shieldTexture->getSize());
+        Rect shieldRect = Rect(backgroundRect.x() + 15, backgroundRect.y() + 5, m_shieldTexture->getSize());
         g_drawQueue->addTexturedRect(shieldRect, m_shieldTexture, Rect(0, 0, m_shieldTexture->getSize()));
     }
     if (m_emblem != Otc::EmblemNone && m_emblemTexture) {
-        Rect emblemRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
+        Rect emblemRect = Rect(backgroundRect.x() + 15 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
         g_drawQueue->addTexturedRect(emblemRect, m_emblemTexture, Rect(0, 0, m_emblemTexture->getSize()));
     }
     if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
-        Rect typeRect = Rect(backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
+        Rect typeRect = Rect(backgroundRect.x() + 15 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
         g_drawQueue->addTexturedRect(typeRect, m_typeTexture, Rect(0, 0, m_typeTexture->getSize()));
     }
     if (m_icon != Otc::NpcIconNone && m_iconTexture) {
-        Rect iconRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_iconTexture->getSize());
+        Rect iconRect = Rect(backgroundRect.x() + 15 + 12, backgroundRect.y() + 5, m_iconTexture->getSize());
         g_drawQueue->addTexturedRect(iconRect, m_iconTexture, Rect(0, 0, m_iconTexture->getSize()));
     }
 }
@@ -656,18 +713,19 @@ void Creature::setHealthPercent(uint8 healthPercent)
         healthPercent = 100;
 
     if (!m_useCustomInformationColor) {
-        if (healthPercent > 92)
-            m_informationColor = Color(0x00, 0xBC, 0x00);
-        else if (healthPercent > 60)
-            m_informationColor = Color(0x50, 0xA1, 0x50);
-        else if (healthPercent > 30)
-            m_informationColor = Color(0xA1, 0xA1, 0x00);
-        else if (healthPercent > 8)
-            m_informationColor = Color(0xBF, 0x0A, 0x0A);
-        else if (healthPercent > 3)
-            m_informationColor = Color(0x91, 0x0F, 0x0F);
+        // Cores elegantes e vibrantes para a barra de vida
+        if (healthPercent > 85)
+            m_informationColor = Color(0x2E, 0xCC, 0x71);  // Verde esmeralda vibrante
+        else if (healthPercent > 65)
+            m_informationColor = Color(0x27, 0xAE, 0x60);  // Verde mais escuro
+        else if (healthPercent > 45)
+            m_informationColor = Color(0xF3, 0x9C, 0x12);  // Laranja dourado
+        else if (healthPercent > 25)
+            m_informationColor = Color(0xE6, 0x7E, 0x22);  // Laranja queimado
+        else if (healthPercent > 10)
+            m_informationColor = Color(0xE7, 0x4C, 0x3C);  // Vermelho coral
         else
-            m_informationColor = Color(0x2C, 0x0F, 0x0F);
+            m_informationColor = Color(0xC0, 0x39, 0x2B);  // Vermelho escuro intenso
     }
 
     bool changed = m_healthPercent != healthPercent;

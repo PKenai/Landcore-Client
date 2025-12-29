@@ -179,18 +179,30 @@ function onHealthChange(localPlayer, health, maxHealth)
   healthCircleFront:setImageClip(rect)
   healthCircleFront:setImageRect(rect)
 
-  if healthPercent > 92 then
-    healthCircleFront:setImageColor("#00BC00FF")
-  elseif healthPercent > 60 then
-    healthCircleFront:setImageColor("#50A150FF")
-  elseif healthPercent > 30 then
-    healthCircleFront:setImageColor("#A1A100FF")
-  elseif healthPercent > 8 then
-    healthCircleFront:setImageColor("#BF0A0AFF")
-  elseif healthPercent > 3 then
-    healthCircleFront:setImageColor("#910F0FFF")
+  -- Cores elegantes para a barra de vida baseadas na porcentagem
+  local healthColor
+  if healthPercent > 85 then
+    healthColor = "#2ECC71FF"  -- Verde esmeralda vibrante
+  elseif healthPercent > 65 then
+    healthColor = "#27AE60FF"  -- Verde mais escuro
+  elseif healthPercent > 45 then
+    healthColor = "#F39C12FF"  -- Laranja dourado
+  elseif healthPercent > 25 then
+    healthColor = "#E67E22FF"  -- Laranja queimado
+  elseif healthPercent > 10 then
+    healthColor = "#E74C3CFF"  -- Vermelho coral
   else
-    healthCircleFront:setImageColor("#850C0CFF")
+    healthColor = "#C0392BFF"  -- Vermelho escuro intenso
+  end
+  
+  healthCircleFront:setImageColor(healthColor)
+  
+  -- Atualiza a cor da barra de vida principal também
+  if healthBar then
+    healthBar:setBackgroundColor(healthColor)
+  end
+  if topHealthBar then
+    topHealthBar:setBackgroundColor(healthColor)
   end
 end
 
@@ -211,6 +223,10 @@ function onManaChange(localPlayer, mana, maxMana)
   local rect = { x = 0, y = Ymppc, width = 63, height = 208 - Ymppc + 1 }
   manaCircleFront:setImageClip(rect)
   manaCircleFront:setImageRect(rect)
+  
+  -- Cor elegante azul para a mana
+  local manaColor = "#3498DBFF"  -- Azul vibrante elegante
+  manaCircleFront:setImageColor(manaColor)
 end
 
 function onLevelChange(localPlayer, value, percent)

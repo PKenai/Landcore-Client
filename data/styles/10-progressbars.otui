@@ -1,5 +1,5 @@
 ProgressBar < UIProgressBar
-  height: 16
+  height: 18
   background-color: red
   image-source: /images/ui/progressbar
   image-border: 1
@@ -16,7 +16,7 @@ ThickProgressBar < ProgressBar
   image-source: /images/ui/progressbar_thick
 
 LifeProgressBar < UIProgressBar
-  height: 16
+  height: 18
   background-color: green
   border: 1 black
   font: verdana-11px-rounded
@@ -30,8 +30,44 @@ ProgressRect < UIProgressRect
   background-color: #00000088
   font: verdana-11px-rounded
 
+// Barra de vida elegante com gradiente vermelho vibrante
 HealthBar < ProgressBar
-  background-color: #ff4444
+  height: 20
+  background-color: #C41E3A
+  image-source: /images/ui/progressbar
+  image-border: 2
+  font: verdana-11px-rounded
+  text-offset: 0 3
+  color: #FFFFFF
+  text-shadow: true
+  text-shadow-offset: 1 1
+  text-shadow-color: #000000AA
 
+// Barra de mana elegante com azul vibrante
 ManaBar < ProgressBar
-  background-color: #4444ff
+  height: 20
+  background-color: #0077DD
+  image-source: /images/ui/progressbar
+  image-border: 2
+  font: verdana-11px-rounded
+  text-offset: 0 3
+  color: #FFFFFF
+  text-shadow: true
+  text-shadow-offset: 1 1
+  text-shadow-color: #000000AA
+
+// Barra de vida compacta para exibição no topo (abaixo do nome)
+TopHealthBar < UIProgressBar
+  height: 8
+  background-color: #C41E3A
+  border: 1 #1A1A1A
+  border-color: #222222
+  phantom: true
+
+// Barra de mana compacta para exibição no topo (abaixo do nome)
+TopManaBar < UIProgressBar
+  height: 8
+  background-color: #0077DD
+  border: 1 #1A1A1A
+  border-color: #222222
+  phantom: true

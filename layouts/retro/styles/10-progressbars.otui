@@ -1,5 +1,5 @@
 ProgressBar < UIProgressBar
-  height: 16
+  height: 18
   background-color: red
   image-source: /images/ui/progressbar
   image-border: 2
@@ -13,7 +13,7 @@ ProgressBar < UIProgressBar
     height: 0
 
 LifeProgressBar < UIProgressBar
-  height: 16
+  height: 18
   background-color: green
   border: 1 black
   font: verdana-11px-rounded
@@ -27,12 +27,44 @@ ProgressRect < UIProgressRect
   background-color: #00000088
   font: verdana-11px-rounded
 
+// Barra de vida elegante com visual moderno
 HealthBar < ProgressBar
   image-source: /images/ui/progressbarhpmana
   image-border: 3
-  background-color: #ff4444
+  height: 20
+  background-color: #C41E3A
+  font: verdana-11px-rounded
+  text-offset: 0 3
+  color: #FFFFFF
 
+// Barra de mana elegante com visual moderno
 ManaBar < ProgressBar
   image-source: /images/ui/progressbarhpmana
   image-border: 4
-  background-color: #4444ff
+  height: 20
+  background-color: #3498DB
+  font: verdana-11px-rounded
+  text-offset: 0 3
+  color: #FFFFFF
+
+// Barra de vida compacta para overlay
+ElegantHealthBar < UIProgressBar
+  height: 10
+  background-color: #C41E3A
+  border: 1 #0A0A0A
+  font: verdana-11px-rounded
+  text-offset: 0 0
+  color: #FFFFFF
+  opacity: 0.95
+  phantom: true
+
+// Barra de mana compacta para overlay
+ElegantManaBar < UIProgressBar
+  height: 10
+  background-color: #3498DB
+  border: 1 #0A0A0A
+  font: verdana-11px-rounded
+  text-offset: 0 0
+  color: #FFFFFF
+  opacity: 0.95
+  phantom: true

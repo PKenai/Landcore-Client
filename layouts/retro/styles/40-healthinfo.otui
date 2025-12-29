@@ -1,6 +1,7 @@
 ExperienceBar < ProgressBar
   id: experienceBar
-  background-color: #B6E866
+  background-color: #50C878
+  height: 16
   anchors.top: prev.bottom
   anchors.left: parent.left
   anchors.right: parent.right
@@ -10,7 +11,7 @@ ExperienceBar < ProgressBar
 SoulLabel < GameLabel
   id: soulLabel
   text-align: right
-  color: white
+  color: #E0E0E0
   font: verdana-11px-rounded
   anchors.bottom: parent.bottom
   anchors.right: parent.right
@@ -26,7 +27,7 @@ SoulLabel < GameLabel
 
 CapLabel < GameLabel
   id: capLabel
-  color: white
+  color: #E0E0E0
   font: verdana-11px-rounded
   anchors.bottom: parent.bottom
   anchors.left: parent.left
@@ -51,18 +52,22 @@ HealthOverlay < UIWidget
   anchors.fill: parent
   phantom: true
   
-  HealthBar
+  // Barra de vida elegante - lado esquerdo
+  ElegantHealthBar
     id: topHealthBar
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.horizontalCenter
+    margin-right: 2
     phantom: true
 
-  ManaBar
+  // Barra de mana elegante - lado direito
+  ElegantManaBar
     id: topManaBar
     anchors.top: parent.top
     anchors.right: parent.right
     anchors.left: parent.horizontalCenter
+    margin-left: 2
     phantom: true
     
   UIProgressBar
@@ -103,13 +108,13 @@ HealthOverlay < UIWidget
     margin-left: 130
     margin-bottom: 16    
     opacity: 0.4
-    image-color: #0000FFFF
+    image-color: #3498DBFF
     phantom: true
   
 HealthInfoWindow < HeadlessMiniWindow
   icon: 
   text:
-  height: 100
+  height: 110
   &forceOpen: true
   icon: /images/topbuttons/healthinfo
   !text: tr('Health Info')  
@@ -117,25 +122,38 @@ HealthInfoWindow < HeadlessMiniWindow
   MiniWindowContents
     margin-top: 2
     
-    HealthBar
-      id: healthBar
+    // Container elegante para as barras
+    Panel
+      id: barsContainer
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
+      height: 52
+      background-color: #0A0A0A66
+      border: 1 #1A1A1A
       margin: 2
       margin-top: 0
-      phantom: true
-      
-    ManaBar
-      id: manaBar
-      anchors.top: prev.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin: 2
-      margin-bottom: 0
-      phantom: true
-      
+      padding: 4
+
+      HealthBar
+        id: healthBar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        phantom: true
+        
+      ManaBar
+        id: manaBar
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 2
+        phantom: true
+        
     ExperienceBar
+      anchors.top: barsContainer.bottom
+      margin-top: 4
+      
     Panel
       id: conditionPanel
       layout:
@@ -147,8 +165,7 @@ HealthInfoWindow < HeadlessMiniWindow
       anchors.left: parent.left
       anchors.right: parent.right
       border-width: 1
-      border-color: #00000077
-      background-color: #ffffff11
+      border-color: #1A1A1A
+      background-color: #0A0A0A55
     SoulLabel
     CapLabel
-
