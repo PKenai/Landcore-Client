@@ -482,6 +482,10 @@ namespace Otc
         GameBigAurasCenter = 119,
         GameNewUpdateWalk = 120,
         GameNewCreatureStacking = 121,
+        
+        // Custom Landcore features
+        GameShieldBar = 130,
+        GameCreatureMana = 131,
         GameCreaturesMana = 122,
         GameQuickLootFlags = 123,
         GameDontMergeAnimatedText = 124,

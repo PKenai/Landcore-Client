@@ -3127,10 +3127,56 @@ void ProtocolGame::parseExtendedOpcode(const InputMessagePtr& msg)
     int opcode = msg->getU8();
     std::string buffer = msg->getString();
 
-    if (opcode == 0)
+    g_logger.info(stdext::format("[ShieldBar] parseExtendedOpcode - opcode: %d, buffer size: %d", opcode, (int)buffer.size()));
+
+    if (opcode == 0) {
         m_enableSendExtendedOpcode = true;
-    else
+    } else if (opcode == Otc::GameShieldBar) {
+        g_logger.info("[ShieldBar] Received GameShieldBar opcode!");
+        // Parse shield bar data: creatureId (4 bytes) + shieldCurrent (4 bytes) + shieldMax (4 bytes)
+        if (buffer.size() >= 12) {
+            uint32 creatureId = static_cast<uint8>(buffer[0]) | 
+                               (static_cast<uint8>(buffer[1]) << 8) | 
+                               (static_cast<uint8>(buffer[2]) << 16) | 
+                               (static_cast<uint8>(buffer[3]) << 24);
+            int32 shieldCurrent = static_cast<uint8>(buffer[4]) | 
+                                  (static_cast<uint8>(buffer[5]) << 8) | 
+                                  (static_cast<uint8>(buffer[6]) << 16) | 
+                                  (static_cast<uint8>(buffer[7]) << 24);
+            int32 shieldMax = static_cast<uint8>(buffer[8]) | 
+                              (static_cast<uint8>(buffer[9]) << 8) | 
+                              (static_cast<uint8>(buffer[10]) << 16) | 
+                              (static_cast<uint8>(buffer[11]) << 24);
+            
+            g_logger.info(stdext::format("[ShieldBar] Parsed - creatureId: %u, shieldCurrent: %d, shieldMax: %d", creatureId, shieldCurrent, shieldMax));
+            
+            CreaturePtr creature = g_map.getCreatureById(creatureId);
+            if (creature) {
+                g_logger.info(stdext::format("[ShieldBar] Found creature: %s, setting shield bar", creature->getName().c_str()));
+                creature->setShieldBar(shieldCurrent, shieldMax);
+            } else {
+                g_logger.error(stdext::format("[ShieldBar] Creature not found with id: %u", creatureId));
+            }
+        } else {
+            g_logger.error(stdext::format("[ShieldBar] Buffer too small: %d bytes (expected >= 12)", (int)buffer.size()));
+        }
+    } else if (opcode == Otc::GameCreatureMana) {
+        // Parse mana data: creatureId (4 bytes) + manaPercent (1 byte)
+        if (buffer.size() >= 5) {
+            uint32 creatureId = static_cast<uint8>(buffer[0]) | 
+                               (static_cast<uint8>(buffer[1]) << 8) | 
+                               (static_cast<uint8>(buffer[2]) << 16) | 
+                               (static_cast<uint8>(buffer[3]) << 24);
+            int8 manaPercent = static_cast<int8>(buffer[4]);
+            
+            CreaturePtr creature = g_map.getCreatureById(creatureId);
+            if (creature) {
+                creature->setManaPercent(manaPercent);
+            }
+        }
+    } else {
         callLuaField("onExtendedOpcode", opcode, buffer);
+    }
 }
 
 void ProtocolGame::parseChangeMapAwareRange(const InputMessagePtr& msg)

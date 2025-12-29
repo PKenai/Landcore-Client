@@ -100,6 +100,12 @@ public:
     std::string getName() { return m_name; }
     uint8 getHealthPercent() { return m_healthPercent; }
     int8 getManaPercent() { return m_manaPercent; }
+    
+    // Shield Bar system
+    int32 getShieldBar() { return m_shieldBar; }
+    int32 getShieldBarMax() { return m_shieldBarMax; }
+    void setShieldBar(int32 value, int32 maxValue);
+    uint8 getShieldBarPercent();
     Otc::Direction getDirection() { return m_direction; }
     Otc::Direction getWalkDirection() { return m_walkDirection; }
     Outfit getOutfit() { return m_outfit; }
@@ -213,6 +219,8 @@ protected:
     std::string m_name;
     uint8 m_healthPercent;
     int8 m_manaPercent;
+    int32 m_shieldBar = 0;
+    int32 m_shieldBarMax = 0;
     Otc::Direction m_direction;
     Otc::Direction m_walkDirection;
     Outfit m_outfit;

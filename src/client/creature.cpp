@@ -148,15 +148,15 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
         fillColor = m_informationColor;
 
     // calculate main rects - hp/mana
-    // Offset especial para o personagem local (37px esquerda, 15px cima)
-    int localPlayerOffsetX = 0;
-    int localPlayerOffsetY = 0;
-    if (isLocalPlayer()) {
-        localPlayerOffsetX = -37;
-        localPlayerOffsetY = -15;
+    // Offset especial para todos os jogadores (37px esquerda, 15px cima)
+    int playerOffsetX = 0;
+    int playerOffsetY = 0;
+    if (isPlayer()) {
+        playerOffsetX = -37;
+        playerOffsetY = -15;
     }
     
-    Rect backgroundRect = Rect(point.x + m_informationOffset.x - (15) + localPlayerOffsetX, point.y + m_informationOffset.y + localPlayerOffsetY, 31, 6);
+    Rect backgroundRect = Rect(point.x + m_informationOffset.x - (15) + playerOffsetX, point.y + m_informationOffset.y + playerOffsetY, 31, 6);
     backgroundRect.bind(parentRect);
 
     //debug            
@@ -171,7 +171,7 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
     }
 
     Size nameSize = m_nameCache.getTextSize();
-    Rect textRect = Rect(point.x + m_informationOffset.x - nameSize.width() / 2.0 + localPlayerOffsetX, point.y + m_informationOffset.y - 12 + localPlayerOffsetY, nameSize);
+    Rect textRect = Rect(point.x + m_informationOffset.x - nameSize.width() / 2.0 + playerOffsetX, point.y + m_informationOffset.y - 12 + playerOffsetY, nameSize);
     textRect.bind(parentRect);
 
     // distance them
@@ -247,8 +247,34 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
             );
             g_drawQueue->addFilledRect(bottomShadow, shadowColor);
         }
+        
+        // Shield Bar - Barra de escudo cinza sobreposta à barra de vida
+        if (m_shieldBar > 0 && m_shieldBarMax > 0) {
+            // Calcula a largura do escudo baseado na porcentagem
+            uint8 shieldPercent = getShieldBarPercent();
+            Rect shieldRect = backgroundRect.expanded(-1);
+            shieldRect.setWidth((shieldPercent / 100.0) * healthBarMaxWidth);
+            
+            if (shieldRect.width() > 0) {
+                // Cor cinza para o escudo com transparência visual
+                Color shieldColor = Color(0x80, 0x80, 0x90);
+                g_drawQueue->addFilledRect(shieldRect, shieldColor);
+                
+                // Highlight no topo (mais claro) - efeito metálico
+                Rect shieldTopHighlight = shieldRect;
+                shieldTopHighlight.setHeight(1);
+                g_drawQueue->addFilledRect(shieldTopHighlight, Color(0xA0, 0xA0, 0xB0));
+                
+                // Sombra na base (mais escura)
+                Rect shieldBottomShadow = shieldRect;
+                shieldBottomShadow.setTop(shieldRect.bottom() - 1);
+                shieldBottomShadow.setHeight(1);
+                g_drawQueue->addFilledRect(shieldBottomShadow, Color(0x60, 0x60, 0x70));
+            }
+        }
 
-        if (drawFlags & Otc::DrawManaBar) {
+        // Mostra barra de mana para todos os jogadores (players)
+        if ((drawFlags & Otc::DrawManaBar) || isPlayer()) {
             int8 manaPercent = m_manaPercent;
             if (isLocalPlayer()) {
                 LocalPlayerPtr player = g_game.getLocalPlayer();
@@ -260,8 +286,12 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
                         manaPercent = (player->getMana() * 100) / maxMana;
                     }
                 }
+            } else if (isPlayer() && manaPercent < 0) {
+                // Para outros jogadores sem mana definida ainda, mostra barra cheia
+                // O servidor deve enviar a mana real via extended opcode
+                manaPercent = 100;
             }
-            if (manaPercent >= 0) {
+            if (manaPercent >= 0 && isPlayer()) {
                 backgroundRect.moveTop(backgroundRect.bottom());
                 if (healthBar) {
                     backgroundRect.moveTop(backgroundRect.top() + healthBar->getBarOffset().y + 1);
@@ -789,6 +819,31 @@ void Creature::setHealthPercent(uint8 healthPercent)
 
     if (healthPercent <= 0)
         onDeath();
+}
+
+// Shield Bar system
+void Creature::setShieldBar(int32 value, int32 maxValue)
+{
+    g_logger.info(stdext::format("[ShieldBar] Creature::setShieldBar called for %s - value: %d, maxValue: %d", m_name.c_str(), value, maxValue));
+    
+    m_shieldBar = std::max<int32>(0, value);
+    m_shieldBarMax = std::max<int32>(0, maxValue);
+    
+    // Ensure shield doesn't exceed max
+    if (m_shieldBarMax > 0 && m_shieldBar > m_shieldBarMax) {
+        m_shieldBar = m_shieldBarMax;
+    }
+    
+    g_logger.info(stdext::format("[ShieldBar] After set - m_shieldBar: %d, m_shieldBarMax: %d", m_shieldBar, m_shieldBarMax));
+    
+    callLuaField("onShieldBarChange", m_shieldBar, m_shieldBarMax);
+}
+
+uint8 Creature::getShieldBarPercent()
+{
+    if (m_shieldBarMax <= 0)
+        return 0;
+    return static_cast<uint8>(std::ceil((static_cast<double>(m_shieldBar) / m_shieldBarMax) * 100));
 }
 
 void Creature::setDirection(Otc::Direction direction)

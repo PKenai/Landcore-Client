@@ -505,6 +505,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("getManaPercent", &LocalPlayer::getManaPercent);
     g_lua.bindClassMemberFunction<Creature>("setHealthPercent", &Creature::setHealthPercent);
     g_lua.bindClassMemberFunction<Creature>("getHealthPercent", &Creature::getHealthPercent);
+    g_lua.bindClassMemberFunction<Creature>("getShieldBar", &Creature::getShieldBar);
+    g_lua.bindClassMemberFunction<Creature>("getShieldBarMax", &Creature::getShieldBarMax);
+    g_lua.bindClassMemberFunction<Creature>("getShieldBarPercent", &Creature::getShieldBarPercent);
+    g_lua.bindClassMemberFunction<Creature>("setShieldBar", &Creature::setShieldBar);
     g_lua.bindClassMemberFunction<Creature>("getSpeed", &Creature::getSpeed);
     g_lua.bindClassMemberFunction<Creature>("setSpeed", &Creature::setSpeed);
     g_lua.bindClassMemberFunction<Creature>("getBaseSpeed", &Creature::getBaseSpeed);
