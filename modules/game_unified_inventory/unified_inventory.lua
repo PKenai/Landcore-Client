@@ -851,6 +851,10 @@ function openVirtualInventoryFromServer()
   end, 500)
 end
 
+function isVisible()
+  return unifiedInventoryWindow and unifiedInventoryWindow:isVisible()
+end
+
 function toggle()
   -- Request server to open virtual inventory
   openVirtualInventoryFromServer()

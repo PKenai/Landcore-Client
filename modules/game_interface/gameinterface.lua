@@ -80,10 +80,17 @@ function bindKeys()
   gameRootPanel:setAutoRepeatDelay(10)
 
   local lastAction = 0
-  g_keyboard.bindKeyPress('Escape', function() 
-    if lastAction + 50 > g_clock.millis() then return end 
+  g_keyboard.bindKeyPress('Escape', function()
+    if lastAction + 50 > g_clock.millis() then return end
     lastAction = g_clock.millis()
-    g_game.cancelAttackAndFollow() 
+
+    -- Close inventory if open
+    if modules.game_unified_inventory and modules.game_unified_inventory.isVisible and modules.game_unified_inventory.isVisible() then
+      modules.game_unified_inventory.toggle()
+      return
+    end
+
+    g_game.cancelAttackAndFollow()
   end, gameRootPanel)
   g_keyboard.bindKeyPress('Ctrl+=', function() if g_game.getFeature(GameNoDebug) then return end gameMapPanel:zoomIn() end, gameRootPanel)
   g_keyboard.bindKeyPress('Ctrl+-', function() if g_game.getFeature(GameNoDebug) then return end gameMapPanel:zoomOut() end, gameRootPanel)
@@ -457,7 +464,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
     menu:addSeparator()
 
     if creatureThing:isLocalPlayer() then
-      menu:addOption(tr('Set Outfit'), function() g_game.requestOutfit() end)
+      menu:addOption(tr('Open Inventory'), function() modules.game_unified_inventory.toggle() end)
 
       if g_game.getFeature(GamePlayerMounts) then
         if not localPlayer:isMounted() then
