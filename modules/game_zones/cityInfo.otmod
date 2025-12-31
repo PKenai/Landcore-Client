@@ -1,0 +1,9 @@
+Module
+  name: cityInfo
+  description: City tooltip
+  autoload: true
+  autoload-priority: 1000
+  scripts: [ cityInfo ]
+  sandboxed: true
+  @onLoad: init()
+  @onUnload: terminate()

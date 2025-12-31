@@ -1,0 +1,6 @@
+MainWindow
+  id: placa
+  size:386 122
+  &save: true
+  opacity: 40
+  focusable: false
