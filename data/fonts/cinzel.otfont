@@ -1,0 +1,6 @@
+Font
+  name: cinzel
+  texture: cinzel
+  height: 13
+  glyph-size: 16 16
+  space-width: 3

@@ -824,7 +824,6 @@ void Creature::setHealthPercent(uint8 healthPercent)
 // Shield Bar system
 void Creature::setShieldBar(int32 value, int32 maxValue)
 {
-    g_logger.info(stdext::format("[ShieldBar] Creature::setShieldBar called for %s - value: %d, maxValue: %d", m_name.c_str(), value, maxValue));
     
     m_shieldBar = std::max<int32>(0, value);
     m_shieldBarMax = std::max<int32>(0, maxValue);
@@ -834,7 +833,6 @@ void Creature::setShieldBar(int32 value, int32 maxValue)
         m_shieldBar = m_shieldBarMax;
     }
     
-    g_logger.info(stdext::format("[ShieldBar] After set - m_shieldBar: %d, m_shieldBarMax: %d", m_shieldBar, m_shieldBarMax));
     
     callLuaField("onShieldBarChange", m_shieldBar, m_shieldBarMax);
 }

@@ -1,0 +1,10 @@
+Module
+  name: monster_loot
+  description: Monster loot virtual inventory display
+  author: AI Assistant
+  sandboxed: true
+  autoload: true
+  reloadable: true
+  scripts: [ monster_loot ]
+  @onLoad: init()
+  @onUnload: terminate()

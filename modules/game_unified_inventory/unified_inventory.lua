@@ -9,6 +9,10 @@ local unifiedInventoryButton = nil
 -- Virtual backpack storage (slot index -> item)
 local virtualBackpack = {}
 
+-- Bank gold display
+local bankGold = 0
+local bankGoldLabel = nil
+
 -- Track last known container item count for change detection
 
 -- Pending item moves (waiting for container to open)
@@ -127,6 +131,19 @@ function init()
     if g_game.isOnline() and LocalPlayer then
       outfitViewer:setCreature(LocalPlayer)
     end
+
+    -- Create bank gold label below outfit viewer
+    bankGoldLabel = g_ui.createWidget('Label', equipmentContainer)
+    bankGoldLabel:setId('bankGoldLabel')
+    bankGoldLabel:addAnchor(AnchorTop, 'outfitViewer', AnchorBottom)
+    bankGoldLabel:addAnchor(AnchorHorizontalCenter, 'outfitViewer', AnchorHorizontalCenter)
+    bankGoldLabel:setMarginTop(-7)
+    bankGoldLabel:setMarginLeft(-50)
+    bankGoldLabel:setText("Bank: 0 gold")
+    bankGoldLabel:setColor('#7C7163')  -- Brown color
+    bankGoldLabel:setFont('verdana-11px-antialised')
+    bankGoldLabel:setTextAlign(AlignLeft)
+    bankGoldLabel:setVisible(true)
     
     -- Create equipment panel (moved to the right)
     local equipmentPanel = g_ui.createWidget('Panel', equipmentContainer)
@@ -209,7 +226,7 @@ function init()
   connect(LocalPlayer, {
     onInventoryChange = onInventoryChange
   })
-  connect(g_game, { 
+  connect(g_game, {
     onGameStart = function()
       -- Enable ExtendedOpcode feature when game starts (if not already enabled)
       if not g_game.getFeature(GameExtendedOpcode) then
@@ -223,7 +240,8 @@ function init()
         g_game.enableFeature(GameExtendedOpcode)
       end
     end,
-    onGameEnd = clearBackpack
+    onGameEnd = clearBackpack,
+    onResourceBalance = onResourceBalance
   })
   connect(Container, {
     onOpen = onContainerOpen,
@@ -1033,6 +1051,9 @@ function refresh()
       outfitViewer:setCreature(player)
     end
   end
+
+  -- Update bank gold display
+  updateBankGoldDisplay()
   
   -- Refresh equipment slots
   for slot = InventorySlotFirst, InventorySlotLast do
@@ -1453,12 +1474,12 @@ function switchEquipment(item)
   if not item or not item:isItem() then
     return
   end
-  
+
   local player = g_game.getLocalPlayer()
   if not player then
     return
   end
-  
+
   -- Get virtual inventory container to find which slot the item is in
   local virtualInventoryContainer = g_game.getContainer(14)
   if not virtualInventoryContainer then
@@ -1470,11 +1491,11 @@ function switchEquipment(item)
       end
     end
   end
-  
+
   if not virtualInventoryContainer then
     return
   end
-  
+
   -- Find the slot where this item is in the virtual inventory
   local itemSlot = nil
   for i = 0, virtualInventoryContainer:getCapacity() - 1 do
@@ -1484,16 +1505,32 @@ function switchEquipment(item)
       break
     end
   end
-  
+
   if not itemSlot then
     return
   end
-  
+
   -- Use extended opcode to request server to equip the item
   -- Format: "equipItem:<slotIndex>"
   local containerId = virtualInventoryContainer:getId()
   local slotIndex = itemSlot
   g_game.getProtocolGame():sendExtendedOpcode(0x02, "equipItem:" .. slotIndex)
+end
+
+function onResourceBalance(type, balance)
+  if type == 0 then -- bank gold
+    bankGold = balance
+    updateBankGoldDisplay()
+  end
+end
+
+function updateBankGoldDisplay()
+  if not bankGoldLabel or not unifiedInventoryWindow then
+    return
+  end
+
+  local formattedGold = comma_value(bankGold)
+  bankGoldLabel:setText("Bank: " .. formattedGold .. " gold")
 end
 
 
