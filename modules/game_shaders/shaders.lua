@@ -13,6 +13,11 @@ function init()
 
   -- UI shaders (for widgets and windows)
   g_shaders.createShader("ui_blood", "/shaders/ui_blood_vertex", "/shaders/ui_blood_fragment")
+  g_shaders.createShader("ui_life_simple", "/shaders/ui_life_simple_vertex", "/shaders/ui_life_simple_fragment")
+
+  -- use modules.game_interface.gameMapPanel:setShader("map_rainbow") to set shader
+  -- use modules.game_interface.gameMapPanel:setShader("map_blood") to set blood shader
+  -- use widget:setImageShader("ui_blood") or widget:setBackgroundShader("ui_blood") for UI widgets
 
   -- use modules.game_interface.gameMapPanel:setShader("map_rainbow") to set shader
   -- use modules.game_interface.gameMapPanel:setShader("map_blood") to set blood shader
