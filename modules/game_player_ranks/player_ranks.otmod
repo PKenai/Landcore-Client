@@ -1,0 +1,14 @@
+Module
+  name: game_player_ranks
+  description: Player Rank Icons
+  author: Auto-generated
+  website:
+  reloadable: true
+  otclientversion: 8
+  sandboxed: true
+
+  @onLoad: init
+  @onUnload: terminate
+
+  dependencies:
+    - gamelib

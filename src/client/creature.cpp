@@ -352,28 +352,58 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
     if (drawFlags & Otc::DrawNames) {
         // Textura estática para a primeira letra (carregada uma vez)
         static TexturePtr firstLetterTexture = g_textures.getTexture("/images/landcore/firstnameletter");
-        
+
+        // Texturas de rank (carregadas uma vez)
+        static TexturePtr rankNormalTexture = g_textures.getTexture("/images/landcore/rank/RankNormal.png");
+        static TexturePtr rankBronzeTexture = g_textures.getTexture("/images/landcore/rank/RankBronze.png");
+        static TexturePtr rankSilverTexture = g_textures.getTexture("/images/landcore/rank/RankSilver.png");
+        static TexturePtr rankGoldTexture = g_textures.getTexture("/images/landcore/rank/RankGold.png");
+        static TexturePtr rankDiamondTexture = g_textures.getTexture("/images/landcore/rank/RankDiamond.png");
+
         // Se for um Player (qualquer jogador), tiver a textura e o nome não estiver vazio
         if (isPlayer() && firstLetterTexture && !m_name.empty() && m_name.length() > 1) {
             BitmapFontPtr font = m_nameCache.getFont();
             if (font) {
                 std::string firstLetter = m_name.substr(0, 1);
                 std::string restOfName = m_name.substr(1);
-                
+
                 Size texSize = firstLetterTexture->getSize();  // 16x16
                 Size firstLetterSize = font->calculateTextRectSize(firstLetter);
                 Size restSize = font->calculateTextRectSize(restOfName);
-                
-                // Largura total: imagem 16px + 1px espaço + resto do nome
-                int totalWidth = 17 + restSize.width();
-                
+
+                // Tamanho do ícone de rank (20x21)
+                Size rankSize(20, 21);
+
+                // Obter nível do jogador (através do módulo Lua)
+                int playerLevel = 0;
+                if (g_lua.isGlobalFieldExistent("PlayerRanks") && g_lua.isGlobalFieldExistent("PlayerRanks", "getPlayerRank")) {
+                    playerLevel = g_lua.callGlobalField<int>("PlayerRanks", "getPlayerRank", getId());
+                }
+
+                // Selecionar textura de rank baseada no nível
+                TexturePtr rankTexture = nullptr;
+                if (playerLevel >= 0 && playerLevel <= 24) {
+                    rankTexture = rankNormalTexture;
+                } else if (playerLevel >= 25 && playerLevel <= 49) {
+                    rankTexture = rankBronzeTexture;
+                } else if (playerLevel >= 50 && playerLevel <= 74) {
+                    rankTexture = rankSilverTexture;
+                } else if (playerLevel >= 75 && playerLevel <= 99) {
+                    rankTexture = rankGoldTexture;
+                } else if (playerLevel >= 100 && playerLevel <= 150) {
+                    rankTexture = rankDiamondTexture;
+                }
+
+                // Largura total: imagem 16px + 1px espaço + rank 20px + 1px espaço + resto do nome
+                int totalWidth = 17 + (rankTexture ? rankSize.width() + 1 : 0) + restSize.width();
+
                 // Posição inicial centralizada (2 pixels mais acima)
                 int startX = textRect.x() + (textRect.width() / 2) - (totalWidth / 2);
                 int startY = textRect.y() - 2;
-                
+
                 // Calcula a posição Y da imagem (também 2 pixels mais acima)
                 int imgY = startY + (firstLetterSize.height() / 2) - (texSize.height() / 2) - 1;
-                
+
                 // Verifica se a imagem iria sobrepor a barra de vida
                 int imgBottom = imgY + texSize.height();
                 int barTop = backgroundRect.y();
@@ -383,19 +413,27 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
                     startY -= moveUp;
                     imgY -= moveUp;
                 }
-                
+
                 // Desenha a imagem de fundo (16x16)
                 Rect firstLetterBgRect = Rect(startX, imgY, texSize);
                 g_drawQueue->addTexturedRect(firstLetterBgRect, firstLetterTexture, Rect(0, 0, texSize));
-                
+
                 // Desenha a primeira letra centralizada na imagem (16x16)
                 int letterX = startX + (texSize.width() / 2) - (firstLetterSize.width() / 2);
                 Rect firstLetterRect = Rect(letterX, startY, firstLetterSize);
                 font->drawText(firstLetter, firstLetterRect, Fw::AlignTopLeft, fillColor);
-                
-                // Desenha o resto do nome começando no pixel 17
-                int restX = startX + 17;
-                Rect restRect = Rect(restX, startY, restSize);
+
+                // Desenha o ícone de rank se disponível (20x21)
+                int currentX = startX + 17;
+                if (rankTexture) {
+                    int rankY = startY + (firstLetterSize.height() / 2) - (rankSize.height() / 2) - 1;
+                    Rect rankRect = Rect(currentX, rankY, rankSize);
+                    g_drawQueue->addTexturedRect(rankRect, rankTexture, Rect(0, 0, rankSize));
+                    currentX += rankSize.width() + 1;
+                }
+
+                // Desenha o resto do nome
+                Rect restRect = Rect(currentX, startY, restSize);
                 font->drawText(restOfName, restRect, Fw::AlignTopLeft, fillColor);
             } else {
                 m_nameCache.draw(textRect, fillColor);
