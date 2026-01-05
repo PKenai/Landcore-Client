@@ -41,5 +41,6 @@ Module
     - game_shaders
     - game_bot
     - game_unified_inventory
+    - targetinfo
   @onLoad: init()
   @onUnload: terminate()

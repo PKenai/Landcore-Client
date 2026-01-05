@@ -35,27 +35,51 @@ AnimatedText::AnimatedText()
 
 void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
 {
-    static float tf = Otc::ANIMATED_TEXT_DURATION;
-    static float tftf = Otc::ANIMATED_TEXT_DURATION * Otc::ANIMATED_TEXT_DURATION;
+    // New animation duration: 800ms (between 600-900ms as requested, optimized for more visible movement)
+    static float tf = 800.0f;
+    static float tftf = tf * tf;
 
     Point p = dest;
     Size textSize = m_cachedText.getTextSize();
     float t = m_animationTimer.ticksElapsed();
     p.x -= textSize.width() / 2;
 
-    if(g_game.getFeature(Otc::GameDiagonalAnimatedText)) {
-        p.x -= (4 * t / tf) + (8 * t * t / tftf);
-    }
+    // Ease-out interpolation function
+    auto easeOutQuad = [](float t, float b, float c, float d) {
+        t /= d;
+        return -c * t * (t - 2) + b;
+    };
 
-    p.y += (-48 * t) / tf;
+    // Choose random diagonal direction (left or right) for this text instance
+    // Use a simple hash of the text content to ensure consistent direction per text
+    std::hash<std::string> hasher;
+    size_t hash = hasher(m_cachedText.getText());
+    bool moveLeft = (hash % 2) == 0; // Alternate based on text hash
+
+    // Calculate progress (0 to 1)
+    float progress = std::min(t / tf, 1.0f);
+
+    // Apply ease-out to progress for smooth movement
+    float easedProgress = easeOutQuad(progress, 0.0f, 1.0f, 1.0f);
+
+    // Vertical movement: rise up with ease-out (60 pixels total - increased for more visible movement)
+    p.y += easeOutQuad(easedProgress, 0.0f, -60.0f, 1.0f);
+
+    // Horizontal movement: drift to the side while rising (makes it look like "falling to the side")
+    // Total horizontal displacement: 50 pixels (increased for more visible WoW-style movement)
+    float horizontalOffset = easeOutQuad(easedProgress, 0.0f, moveLeft ? -50.0f : 50.0f, 1.0f);
+    p.x += horizontalOffset;
+
     p += m_offset;
     Rect rect(p, textSize);
 
     if(visibleRect.contains(rect)) {
-        float t0 = tf / 1.2;
+        // Fade out starts at 80% of animation duration
+        float fadeStart = tf * 0.8f;
         Color color = m_color;
-        if(t > t0) {
-            color.setAlpha((float)(1 - (t - t0) / (tf - t0)));
+        if(t > fadeStart) {
+            float fadeProgress = (t - fadeStart) / (tf - fadeStart);
+            color.setAlpha(1.0f - fadeProgress);
         }
         m_cachedText.draw(rect, color);
     }
@@ -65,9 +89,9 @@ void AnimatedText::onAppear()
 {
     m_animationTimer.restart();
 
-    // schedule removal
+    // schedule removal - new duration: 800ms
     auto self = asAnimatedText();
-    g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, Otc::ANIMATED_TEXT_DURATION);
+    g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, 800);
 }
 
 void AnimatedText::setColor(int color)
@@ -93,7 +117,8 @@ bool AnimatedText::merge(const AnimatedTextPtr& other)
     if(other->getCachedText().getFont() != m_cachedText.getFont())
         return false;
 
-    if(m_animationTimer.ticksElapsed() > Otc::ANIMATED_TEXT_DURATION / 2.5)
+    // Updated merge threshold for new 800ms duration
+    if(m_animationTimer.ticksElapsed() > 800.0f / 2.5f)
         return false;
 
     try {

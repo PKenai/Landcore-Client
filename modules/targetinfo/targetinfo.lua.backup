@@ -1,0 +1,141 @@
+function init()
+  print("TARGETINFO MODULE LOADED")
+
+  if g_game.isOnline() then
+    createInterface()
+  else
+    connect(g_game, {
+      onGameStart = createInterface
+    })
+  end
+end
+
+function createInterface()
+  print("Creating target portrait interface...")
+
+  if not modules.game_interface then
+    print("ERROR: modules.game_interface not available")
+    return
+  end
+
+  local rootPanel = modules.game_interface.getRootPanel()
+  if not rootPanel then
+    print("ERROR: rootPanel not available")
+    return
+  end
+
+  print("DEBUG: rootPanel found, creating UI...")
+
+  -- Criar interface com a imagem de fundo especificada
+  local ui = g_ui.createWidget("UIWidget", rootPanel)
+  ui:setId("targetInfoWindow")
+  ui:setImageSource("/images/landcore/Target_portrait.png")
+  ui:addAnchor(AnchorTop, "parent", AnchorTop)
+  ui:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)
+  ui:setMarginTop(10)
+  ui:setDraggable(true)
+  ui:hide()
+
+  -- Sprite da criatura (agora no topo)
+  local creatureWidget = g_ui.createWidget("UICreature", ui)
+  creatureWidget:addAnchor(AnchorTop, "parent", AnchorTop)
+  creatureWidget:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)
+  creatureWidget:setMarginTop(15)
+  creatureWidget:setWidth(64)
+  creatureWidget:setHeight(64)
+
+  print("DEBUG: UICreature widget created successfully - TEST CHANGE")
+
+  -- Nome da criatura (abaixo da criatura)
+  local nameLabel = g_ui.createWidget("UILabel", ui)
+  nameLabel:setText("Alvo")
+  nameLabel:setColor("#ffffff")
+  nameLabel:setFont("verdana-11px-antialised")
+  nameLabel:setTextAutoResize(true)
+  nameLabel:addAnchor(AnchorTop, "creatureWidget", AnchorBottom)
+  nameLabel:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)
+  nameLabel:setMarginTop(5)
+
+  -- Barra de vida
+  local healthBar = g_ui.createWidget("UIWidget", ui)
+  healthBar:setBackgroundColor("#44ff44")
+  healthBar:addAnchor(AnchorBottom, "parent", AnchorBottom)
+  healthBar:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)
+  healthBar:setMarginBottom(20)
+  healthBar:setHeight(8)
+  healthBar:setWidth(120)
+
+  -- Porcentagem de vida
+  local healthText = g_ui.createWidget("UILabel", ui)
+  healthText:setText("100%")
+  healthText:setColor("#ffffff")
+  healthText:setFont("verdana-11px-antialised")
+  healthText:addAnchor(AnchorBottom, "healthBar", AnchorTop)
+  healthText:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)
+  healthText:setMarginBottom(2)
+
+  print("Interface created, connecting events...")
+
+  -- Para teste: mostrar o portrait imediatamente com uma criatura de teste
+  print("DEBUG: Testing UICreature visibility")
+
+  -- Criar um outfit básico para teste (um deer simples)
+  local testOutfit = {
+    type = 31, -- Deer outfit ID
+    head = 0,
+    body = 0,
+    legs = 0,
+    feet = 0,
+    addons = 0
+  }
+
+  creatureWidget:setOutfit(testOutfit)
+  creatureWidget:setVisible(true)
+  ui:show()
+
+  print("DEBUG: Test creature should be visible now")
+
+  -- Usar o evento que funciona: onAttackingCreatureChange do g_game
+  connect(g_game, {
+    onAttackingCreatureChange = function(creature)
+      if creature then
+        print("TARGET: " .. creature:getName())
+        nameLabel:setText(creature:getName())
+
+        -- Configurar a criatura com verificações de debug
+        print("DEBUG: Setting creature: " .. creature:getName())
+        print("DEBUG: Creature ID: " .. tostring(creature:getId()))
+
+        -- Tentar definir o creature ID diretamente
+        creatureWidget:setCreature(creature)
+
+        -- Como alternativa, tentar o outfit
+        local outfit = creature:getOutfit()
+        if outfit then
+          print("DEBUG: Setting outfit for creature")
+          creatureWidget:setOutfit(outfit)
+        end
+
+        creatureWidget:setVisible(true)
+
+        local healthPercent = creature:getHealthPercent() or 100
+        healthText:setText(healthPercent .. "%")
+        healthBar:setWidth(math.floor(120 * healthPercent / 100))
+
+        ui:show()
+        print("Target portrait visible!")
+      else
+        print("No target")
+        ui:hide()
+      end
+    end
+  })
+
+  print("Target portrait module ready!")
+
+  print("=== CREATE INTERFACE COMPLETE ===")
+end
+
+function terminate()
+  print("Target portrait module unloaded")
+end
