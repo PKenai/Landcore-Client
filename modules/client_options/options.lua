@@ -5,10 +5,10 @@ local defaultOptions = {
   showPing = true,
   fullscreen = false,
   autoFullscreenOnStartup = false,
-  classicView = true,
+  classicView = not g_app.isMobile(),
   cacheMap = g_app.isMobile(),
   classicControl = not g_app.isMobile(),
-  smartWalk = true,
+  smartWalk = false,
   dash = false,
   autoChaseOverride = true,
   showStatusMessagesInConsole = true,
@@ -21,7 +21,7 @@ local defaultOptions = {
   rightPanels = 1,
   leftPanels = g_app.isMobile() and 1 or 2,
   containerPanel = 8,
-  backgroundFrameRate = 200,
+  backgroundFrameRate = 60,
   enableAudio = true,
   enableMusicSound = false,
   musicSoundVolume = 100,
@@ -44,16 +44,16 @@ local defaultOptions = {
   turnDelay = 30,
   hotkeyDelay = 30,
     
-  wsadWalking = true,
+  wsadWalking = false,
   walkFirstStepDelay = 200,
   walkTurnDelay = 100,
   walkStairsDelay = 50,
   walkTeleportDelay = 200,
   walkCtrlTurnDelay = 150,
 
-  topBar = false,
+  topBar = true,
 
-  actionbar1 = false,
+  actionbar1 = true,
   actionbar2 = false,
   actionbar3 = false,
   actionbar4 = false,
@@ -102,7 +102,6 @@ function init()
 
   g_keyboard.bindKeyDown('Ctrl+Shift+F', function() toggleOption('fullscreen') end)
   g_keyboard.bindKeyDown('Ctrl+N', toggleDisplays)
-  g_keyboard.bindKeyDown('Ctrl+M', toggle)
 
   generalPanel = g_ui.loadUI('game')
   optionsTabBar:addTab(tr('Game'), generalPanel, '/images/optionstab/game')
@@ -152,7 +151,6 @@ function terminate()
 
   g_keyboard.unbindKeyDown('Ctrl+Shift+F')
   g_keyboard.unbindKeyDown('Ctrl+N')
-  g_keyboard.unbindKeyDown('Ctrl+M')
   optionsWindow:destroy()
   optionsButton:destroy()
   audioButton:destroy()

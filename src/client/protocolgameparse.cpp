@@ -831,7 +831,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
                 bool disabled = msg->getU8() > 0;
                 if (disabled) {
                     int errors = msg->getU8();
-                    for (int i = 0; i < errors; ++i)
+                    for (int e = 0; e < errors; ++e)
                         msg->getString(); // error msg
                 }
                 offer.state = msg->getU8();
