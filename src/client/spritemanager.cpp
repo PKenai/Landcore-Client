@@ -31,6 +31,30 @@
 #include <framework/graphics/xbrz.h>
 #include <framework/graphics/upscaler.h>
 
+namespace {
+void remapBlackPixels(const ImagePtr& image)
+{
+    if (!image)
+        return;
+
+    uint8_t* pixels = image->getPixelData();
+    if (!pixels)
+        return;
+
+    const auto pixelCount = image->getPixelCount();
+    for (auto i = 0; i < pixelCount; ++i) {
+        uint8_t* pixel = pixels + (i * 4);
+        const bool isOpaque = pixel[3] != 0x00;
+        const bool isPureBlack = pixel[0] == 0x00 && pixel[1] == 0x00 && pixel[2] == 0x00;
+        if (isOpaque && isPureBlack) {
+            pixel[0] = 0x16;
+            pixel[1] = 0x14;
+            pixel[2] = 0x24;
+        }
+    }
+}
+}
+
 SpriteManager g_sprites;
 
 SpriteManager::SpriteManager()
@@ -428,6 +452,7 @@ ImagePtr SpriteManager::getSpriteImageCasual(int id)
                 }
             }
 
+            remapBlackPixels(image);
             return image;
         }
 
@@ -530,6 +555,7 @@ ImagePtr SpriteManager::getSpriteImageCasual(int id)
             scaledImage = Upscaler::applyPostProcessing(scaledImage);
         }
 
+        remapBlackPixels(scaledImage);
         return scaledImage;
     }
     catch (stdext::exception& e) {
@@ -549,7 +575,9 @@ ImagePtr SpriteManager::getSpriteImageHd(int id)
     }
 
     try {
-        return Image::loadPNG(m_cachedData[id].data(), m_cachedData[id].size());
+        auto image = Image::loadPNG(m_cachedData[id].data(), m_cachedData[id].size());
+        remapBlackPixels(image);
+        return image;
     } catch (...) {}
     return nullptr;
 }

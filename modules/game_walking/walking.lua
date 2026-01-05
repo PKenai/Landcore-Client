@@ -411,16 +411,18 @@ function turn(dir, repeated)
   
   removeEvent(walkEvent)
   
-  if not repeated or (lastTurn + 100 < g_clock.millis()) then
+  local turnDelay = math.max(0, g_settings.getNumber('turnDelay'))
+  if not repeated or (lastTurn + turnDelay < g_clock.millis()) then
     g_game.turn(dir)
     changeWalkDir(dir)
     lastTurn = g_clock.millis()
-    if not repeated then
-      lastTurn = g_clock.millis() + 50
-    end
     lastTurnDirection = dir
     nextWalkDir = nil
-    player:lockWalk(g_settings.getNumber('walkCtrlTurnDelay'))
+
+    local ctrlTurnLock = math.max(0, g_settings.getNumber('walkCtrlTurnDelay'))
+    if ctrlTurnLock > 0 then
+      player:lockWalk(ctrlTurnLock)
+    end
   end
 end
 
