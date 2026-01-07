@@ -11,16 +11,16 @@ local BUOY_WIDTH = 28
 local BUOY_HEIGHT = 24
 
 -- Gameplay tuning
-local UPDATE_INTERVAL = 50 -- ms between physics ticks
+local UPDATE_INTERVAL = 40 -- ms between physics ticks (mais responsivo)
 local CANCEL_THRESHOLD = 0.10 -- 10% from each edge
-local CENTER_TOLERANCE = 0.50 -- ±10% around center counts as control
+local CENTER_TOLERANCE = 0.08 -- janela central mais estreita, mais difícil
 local SUCCESS_HOLD_MS = 7000 -- need 7s centered to succeed
 
 -- Forces (normalized 0..1 across the bar)
 local FORCE_BASE_MIN = 0.003
 local FORCE_BASE_MAX = 0.008
-local FORCE_JITTER = 0.002
-local PLAYER_IMPULSE = 0.035 -- push right per space tap
+local FORCE_JITTER = 0.0035
+local PLAYER_IMPULSE = 0.020 -- impulso menor exige mais toques
 
 -- Module variables
 local fishingWindow = nil
@@ -66,7 +66,9 @@ end
 
 -- Handler for text messages (avoid unhandled warnings)
 function handleTextMessage(mode, text)
-  if string.find(text, "fish") then
+  if string.find(text, "fish")
+     or string.find(text, "catch")
+     or string.find(text, "caught") then
     debugLog("Captured fishing text message: " .. text)
     return true
   end
