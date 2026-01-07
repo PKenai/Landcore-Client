@@ -104,6 +104,18 @@ void Creature::draw(const Point& dest, bool animate, LightView* lightView)
     if (m_outfit.getCategory() != ThingCategoryCreature)
         animationOffset -= getDisplacement();
 
+    // Desenhar sombra com shader simples e inclinação leve
+    Point shadowOffset = Point(0, 3);
+    std::string originalShader = m_outfit.getShader();
+    m_outfit.setShader("simple_soft_shadow");
+    size_t shadowDrawQueueStart = g_drawQueue->size();
+    Point shadowPos = dest - jumpOffset + animationOffset - getDisplacement() + shadowOffset;
+    m_outfit.draw(shadowPos, m_walking ? m_walkDirection : m_direction, m_walkAnimationPhase, true, lightView);
+    Point shadowCenter = shadowPos + Point(sprSize / 2, sprSize / 2);
+    const float angleRad = -15.0f * 3.14159265f / 180.0f;
+    g_drawQueue->setRotation(shadowDrawQueueStart, shadowCenter, angleRad);
+    m_outfit.setShader(originalShader);
+
     size_t drawQueueSize = g_drawQueue->size();
     m_outfit.draw(dest - jumpOffset + animationOffset, m_walking ? m_walkDirection : m_direction, m_walkAnimationPhase, true, lightView);
     if (m_marked) {

@@ -196,6 +196,16 @@ struct DrawQueueConditionMark : public DrawQueueCondition {
     Color m_color;
 };
 
+struct DrawQueueConditionFlipHorizontal : public DrawQueueCondition {
+    DrawQueueConditionFlipHorizontal(size_t start, size_t end, const Point& center) :
+        DrawQueueCondition(start, end), m_center(center) {}
+
+    void start(DrawQueue* queue) override;
+    void end(DrawQueue* queue) override;
+
+    Point m_center;
+};
+
 class DrawQueue {
 public:
     DrawQueue() = default;
@@ -319,6 +329,12 @@ public:
     {
         if (start == m_queue.size()) return;
         m_conditions.push_back(new DrawQueueConditionMark(start, m_queue.size(), color));
+    }
+
+    void setFlipHorizontal(size_t start, const Point& center)
+    {
+        if (start == m_queue.size()) return;
+        m_conditions.push_back(new DrawQueueConditionFlipHorizontal(start, m_queue.size(), center));
     }
 
     void markMapPosition()

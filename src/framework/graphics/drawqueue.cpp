@@ -225,6 +225,20 @@ void DrawQueueConditionMark::start(DrawQueue*)
     // nothing
 }
 
+void DrawQueueConditionFlipHorizontal::start(DrawQueue*)
+{
+    g_painter->pushTransformMatrix();
+    // Espelha horizontalmente em torno do centro informado
+    g_painter->translate(m_center.x, m_center.y);
+    g_painter->scale(-1.0f, 1.0f);
+    g_painter->translate(-m_center.x, -m_center.y);
+}
+
+void DrawQueueConditionFlipHorizontal::end(DrawQueue*)
+{
+    g_painter->popTransformMatrix();
+}
+
 void DrawQueueConditionMark::end(DrawQueue* queue)
 {
     g_painter->setDrawColorOnTextureShaderProgram();
@@ -233,6 +247,14 @@ void DrawQueueConditionMark::end(DrawQueue* queue)
         DrawQueueItemTexturedRect* texture = dynamic_cast<DrawQueueItemTexturedRect*>(queue->m_queue[i]);
         if (texture)
             g_painter->drawTexturedRect(texture->m_dest, texture->m_texture, texture->m_src);
+
+        // Também aplica marcação em outfits (com e sem shader)
+        if (auto outfit = dynamic_cast<DrawQueueItemOutfit*>(queue->m_queue[i])) {
+            g_painter->drawTexturedRect(outfit->m_dest, outfit->m_texture, outfit->m_src);
+        }
+        if (auto outfitShader = dynamic_cast<DrawQueueItemOutfitWithShader*>(queue->m_queue[i])) {
+            g_painter->drawTexturedRect(outfitShader->m_dest, outfitShader->m_texture, outfitShader->m_src);
+        }
     }
     g_painter->resetShaderProgram();
 }

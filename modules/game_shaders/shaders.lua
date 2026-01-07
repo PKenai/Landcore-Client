@@ -25,6 +25,8 @@ function init()
 
   -- outfit shaders
   g_shaders.createOutfitShader("outfit_default", "/shaders/outfit_default_vertex", "/shaders/outfit_default_fragment")
+  -- shadow shader usado na Creature::draw (sombra inclinada)
+  g_shaders.createOutfitShader("simple_soft_shadow", "/shaders/outfit_default_vertex", "/shaders/simple_soft_shadow_fragment")
 
   g_shaders.createOutfitShader("outfit_rainbow", "/shaders/outfit_rainbow_vertex", "/shaders/outfit_rainbow_fragment")
   g_shaders.addTexture("outfit_rainbow", "/images/shaders/rainbow.png")
