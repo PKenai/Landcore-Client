@@ -41,5 +41,6 @@ Module
     - game_shaders
     - game_bot
     - game_unified_inventory
+    - game_notifications
   @onLoad: init()
   @onUnload: terminate()

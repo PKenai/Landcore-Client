@@ -1,0 +1,9 @@
+Module
+  name: game_notifications
+  description: Notification System
+  author: Mrlthebest
+  website: None
+  sandboxed: true
+  scripts: [ notification ]
+  @onLoad: init()
+  @onUnload: terminate()

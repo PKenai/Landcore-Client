@@ -1,0 +1,93 @@
+PanelNotification < Panel
+  id: panelNotification
+  anchors.top: parent.top
+  anchors.left: parent.left
+  margin-top: 30
+  margin-left: 0
+  size: 280 400
+  layout:
+    type: verticalBox
+    spacing: 5
+    fit-children: true
+
+NotifyPanel < Panel
+  size: 270 60
+  background-color: black
+  border: 1 orange
+  padding: 8
+
+  Panel
+    id: icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 32 32
+    visible: false
+
+  Label
+    id: message
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 80
+    text-auto-resize: true
+    text-align: center
+    text-wrap: true
+    font: verdana-11px-antialised
+    color: #ffffff
+    visible: false
+
+  UIButton
+    id: actionButton
+    anchors.left: message.left
+    anchors.right: message.right
+    anchors.top: message.top
+    anchors.bottom: message.bottom
+    text:
+    visible: false
+    border-width: 0
+    background-color: alpha
+
+  ProgressBar
+    id: progress
+    anchors.left: message.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    height: 6
+    background-color: red
+
+  UIButton
+    id: closeButton
+    anchors.top: parent.top
+    anchors.right: parent.right
+    text: X
+    font: verdana-11px-antialised
+    border-width: 0
+    @onClick: modules.game_notification.hideNotify(self:getParent())
+
+ItemNotify < Panel
+  size: 64 64
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+  margin-left: 10
+  UIItem
+    id: item
+    anchors.fill: parent
+
+
+OutfitNotify < Panel
+  size: 64 64
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+
+  UICreature
+    id: creature
+    anchors.fill: parent
+
+ImageNotify < Panel
+  size: 64 64
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+  margin-left: 20
+  UIWidget
+    id: image
+    anchors.fill: parent

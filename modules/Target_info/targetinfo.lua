@@ -60,8 +60,6 @@ local function setCreature(creature)
 end
 
 function init()
-  print("[targetinfo] init")
-
   if g_game.isOnline() then
     createInterface()
   else
@@ -84,8 +82,6 @@ function terminate()
 end
 
 function createInterface()
-  print("[targetinfo] createInterface")
-
   if ui then
     print("[targetinfo] ui already exists")
     return
@@ -117,7 +113,6 @@ function createInterface()
   end
 
   baseHealthWidth = healthBar:getWidth() > 0 and healthBar:getWidth() or 120
-  print(string.format("[targetinfo] baseHealthWidth=%d", baseHealthWidth))
 
   ui:hide()
 

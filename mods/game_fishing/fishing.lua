@@ -60,8 +60,6 @@ function init()
   if g_game.isOnline() then
     create()
   end
-
-  debugLog("Fishing module initialized")
 end
 
 -- Handler for text messages (avoid unhandled warnings)
@@ -91,7 +89,6 @@ end
 
 -- Create placeholder state
 function create()
-  debugLog("Game started, waiting for fishing window request")
 end
 
 -- Clean up interface
