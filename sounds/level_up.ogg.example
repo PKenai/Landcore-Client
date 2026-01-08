@@ -1,0 +1,21 @@
+# Arquivo de exemplo para som de level up
+
+Este arquivo demonstra como adicionar sons personalizados para eventos específicos.
+
+Para criar um som de level up:
+1. Grave ou baixe um efeito sonoro de "level up"
+2. Converta para formato .ogg
+3. Renomeie para "level_up.ogg" (remova .example)
+4. Use no servidor: sound.sendSoundOtc(player, "level_up", 3)
+
+Exemplo de código no servidor:
+```lua
+-- Quando o jogador sobe de level
+if player:getLevel() > oldLevel then
+    sendPlayerNotification(player, "Parabéns! Level up!", 5, "text", "⬆️", {})
+    sound.sendSoundOtc(player, "level_up", 3) -- Som adicional personalizado
+end
+```
+
+Duração recomendada: 2-4 segundos
+Tipo: Efeito sonoro festivo/motivacional

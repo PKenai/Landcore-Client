@@ -120,6 +120,11 @@ function terminate()
 end
 
 function onGameStart()
+  -- Carrega módulo de sons se disponível
+  if g_modules.getModule("game_sounds") then
+    g_modules.ensureModuleLoaded("game_sounds")
+  end
+
   refreshViewMode()
   show()
   
