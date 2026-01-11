@@ -1349,21 +1349,47 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
       mode == MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or
       mode == MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or
       mode == MessageModes.NpcFromStartBlock) and creaturePos then
-    local staticText = StaticText.create()
-    -- Remove curly braces from screen message
-    local staticMessage = message
-    if isNpcMode then
-      local highlightData = getNewHighlightedText(staticMessage, speaktype.color, "#3ebaf3")
-      if #highlightData > 2 then
-        staticText:addColoredMessage(name, mode, highlightData)
+
+    -- Try to find the creature that spoke the message at the specified position
+    local tile = g_map.getTile(creaturePos)
+    local creature = tile and tile:getTopCreature()
+
+    if creature then
+      -- Check if the method exists before calling it
+      if type(creature.addChatMessage) == "function" then
+        -- Add message to the creature so it follows the creature
+        -- Extract RGB values from hex color string
+        local colorHex = speaktype.color or "#FFFFFF"
+        local r = tonumber(colorHex:sub(2, 3), 16) or 255
+        local g = tonumber(colorHex:sub(4, 5), 16) or 255
+        local b = tonumber(colorHex:sub(6, 7), 16) or 255
+        local success, errorMsg = pcall(function()
+          creature:addChatMessage(mode, message, isNpcMode and true or false, r, g, b)
+        end)
+        if not success then
+          g_logger.warning("Failed to add chat message to creature: " .. errorMsg)
+        end
+      else
+        g_logger.warning("addChatMessage method not found on creature")
+      end
+    else
+      -- Fallback: create static text at position (old behavior)
+      local staticText = StaticText.create()
+      -- Remove curly braces from screen message
+      local staticMessage = message
+      if isNpcMode then
+        local highlightData = getNewHighlightedText(staticMessage, speaktype.color, "#3ebaf3")
+        if #highlightData > 2 then
+          staticText:addColoredMessage(name, mode, highlightData)
+        else
+          staticText:addMessage(name, mode, staticMessage)
+        end
+        staticText:setColor(speaktype.color)
       else
         staticText:addMessage(name, mode, staticMessage)
       end
-      staticText:setColor(speaktype.color)
-    else
-      staticText:addMessage(name, mode, staticMessage)
+      g_map.addThing(staticText, creaturePos, -1)
     end
-    g_map.addThing(staticText, creaturePos, -1)
   end
 
   local defaultMessage = mode <= 3 and true or false

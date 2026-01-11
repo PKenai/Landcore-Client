@@ -34,6 +34,23 @@
 #include <framework/graphics/cachedtext.h>
 #include <framework/ui/uiwidget.h>
 
+struct ChatMessage {
+    int mode;
+    std::string message;
+    bool isNpcMode;
+    Color speakColor;
+    Timer timer;
+
+    // Animation properties
+    float currentY;      // Current Y position
+    float targetY;       // Target Y position
+    float animationSpeed; // Speed of animation (pixels per second)
+    bool isAnimating;    // Whether the message is currently animating
+    Timer animationTimer; // Timer for animation
+    Timer fadeTimer;     // Timer for fade out effect
+    bool isFading;       // Whether the message is fading out
+};
+
  // @bindclass
 class Creature : public Thing
 {
@@ -91,6 +108,10 @@ public:
     void setText(const std::string& text, const Color& color);
     std::string getText();
     void clearText() { setText("", Color::white); }
+
+    void addChatMessage(int mode, const std::string& message, bool isNpcMode, int r, int g, int b);
+    static void removeOldChatMessages(uint32 creatureId);
+    CreaturePtr asCreature() { return static_self_cast<Creature>(); }
 
     void setTitle(const std::string& title, const std::string& font, const Color& color);
     void clearTitle() { setTitle("", "", Color::white); }
@@ -287,6 +308,9 @@ protected:
 
     // for bot
     StaticTextPtr m_text;
+
+    // chat messages that follow the creature
+    std::deque<ChatMessage> m_chatMessages;
 
     // widgets
     std::list<UIWidgetPtr> m_bottomWidgets;

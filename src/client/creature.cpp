@@ -33,6 +33,7 @@
 #include "healthbars.h"
 
 #include <framework/graphics/graphics.h>
+#include <framework/graphics/drawqueue.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/graphicalapplication.h>
@@ -429,6 +430,132 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
             auto extraTextSize = m_text->getCachedText().getTextSize();
             Rect extraTextRect = Rect(point.x + m_informationOffset.x - extraTextSize.width() / 2.0, point.y + m_informationOffset.y + 15, extraTextSize);
             m_text->drawText(extraTextRect.center(), extraTextRect);
+        }
+
+        // Draw chat messages that follow the creature (with smooth slide animation and fade out)
+        for (size_t i = 0; i < m_chatMessages.size(); ++i) {
+            ChatMessage& chatMsg = m_chatMessages[i];
+
+            // Update animation
+            if (chatMsg.isAnimating) {
+                float deltaTime = chatMsg.animationTimer.ticksElapsed() / 1000.0f; // Convert to seconds
+                float distance = chatMsg.animationSpeed * deltaTime;
+
+                if (chatMsg.currentY > chatMsg.targetY) {
+                    chatMsg.currentY -= distance;
+                    if (chatMsg.currentY <= chatMsg.targetY) {
+                        chatMsg.currentY = chatMsg.targetY;
+                        chatMsg.isAnimating = false;
+                    }
+                } else if (chatMsg.currentY < chatMsg.targetY) {
+                    chatMsg.currentY += distance;
+                    if (chatMsg.currentY >= chatMsg.targetY) {
+                        chatMsg.currentY = chatMsg.targetY;
+                        chatMsg.isAnimating = false;
+                    }
+                }
+            }
+
+            // Calculate fade out opacity (2 seconds fade)
+            float fadeOpacity = 1.0f;
+            if (chatMsg.isFading) {
+                float fadeTime = chatMsg.fadeTimer.ticksElapsed() / 2000.0f; // 2 seconds fade
+                fadeOpacity = std::max(0.0f, 1.0f - fadeTime);
+            }
+
+            // Split message into lines of maximum 20 characters
+            std::string message = chatMsg.message;
+            const int maxCharsPerLine = 20;
+
+            std::vector<std::string> lines;
+            size_t pos = 0;
+            while (pos < message.length()) {
+                size_t lineLength = std::min(static_cast<size_t>(maxCharsPerLine), message.length() - pos);
+
+                // Try to break at word boundary if possible (but don't go back more than half the line)
+                if (pos + lineLength < message.length() && message[pos + lineLength] != ' ') {
+                    size_t lastSpace = message.rfind(' ', pos + lineLength);
+                    if (lastSpace != std::string::npos && lastSpace > pos && (pos + lineLength - lastSpace) <= maxCharsPerLine / 2) {
+                        lineLength = lastSpace - pos;
+                    }
+                }
+
+                lines.push_back(message.substr(pos, lineLength));
+                pos += lineLength;
+
+                // Skip any leading spaces on next line
+                while (pos < message.length() && message[pos] == ' ') {
+                    pos++;
+                }
+            }
+
+            // Calculate total height needed for all lines
+            int totalHeight = 0;
+            std::vector<Size> lineSizes;
+            for (const std::string& line : lines) {
+                if (!line.empty()) {
+                    StaticText tempText;
+                    tempText.setFont("verdana-11px-rounded");
+                    tempText.setText(line);
+                    Size lineSize = tempText.getCachedText().getTextSize();
+                    lineSizes.push_back(lineSize);
+                    totalHeight += lineSize.height() + 2; // Add spacing between lines
+                }
+            }
+            if (!lineSizes.empty()) {
+                totalHeight -= 2; // Remove extra spacing from last line
+            }
+
+            // Find the maximum width among all lines
+            int maxWidth = 0;
+            for (const Size& size : lineSizes) {
+                maxWidth = std::max(maxWidth, size.width());
+            }
+
+            // Use animated Y position
+            float animatedOffset = chatMsg.currentY;
+            const float xOffset = -30.0f; // Move 30 pixels to the left
+
+            // Draw background box using drawQueue (correct way)
+            if (maxWidth > 0 && totalHeight > 0) {
+                Rect backgroundRect = Rect(point.x + m_informationOffset.x + xOffset - maxWidth / 2.0 - 4,
+                                          point.y + m_informationOffset.y + animatedOffset - 2,
+                                          maxWidth + 8, totalHeight + 4);
+
+                // Draw shadow effect (slightly offset black) with fade
+                Rect shadowRect = backgroundRect.translated(1, 1);
+                int shadowAlpha = static_cast<int>(100 * fadeOpacity);
+                g_drawQueue->addFilledRect(shadowRect, Color(0, 0, 0, shadowAlpha));
+
+                // Draw main background (more transparent) with fade
+                int backgroundAlpha = static_cast<int>(150 * fadeOpacity);
+                g_drawQueue->addFilledRect(backgroundRect, Color(0, 0, 0, backgroundAlpha));
+            }
+
+            // Draw each line with fade
+            float currentLineOffset = animatedOffset;
+            for (size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex) {
+                const std::string& line = lines[lineIndex];
+                if (!line.empty()) {
+                    // Create static text on demand for rendering
+                    StaticText tempText;
+                    tempText.setFont("verdana-11px-rounded");
+                    tempText.setText(line);
+
+                    // Apply fade to text color
+                    Color fadedColor = chatMsg.speakColor;
+                    fadedColor.setAlpha(static_cast<uint8>(255 * fadeOpacity));
+                    tempText.setColor(fadedColor);
+
+                    auto messageSize = lineSizes[lineIndex];
+                    Rect messageRect = Rect(point.x + m_informationOffset.x + xOffset - messageSize.width() / 2.0,
+                                           point.y + m_informationOffset.y + currentLineOffset,
+                                           messageSize);
+
+                    tempText.drawText(messageRect.center(), messageRect);
+                    currentLineOffset += messageSize.height() + 2; // Add some spacing between lines
+                }
+            }
         }
     }
 
@@ -1287,6 +1414,93 @@ std::string Creature::getText()
         return "";
     }
     return m_text->getText();
+}
+
+void Creature::addChatMessage(int mode, const std::string& message, bool isNpcMode, int r, int g, int b)
+{
+    // Limit the number of messages per creature to avoid spam
+    if (m_chatMessages.size() >= 5) {
+        m_chatMessages.pop_front();
+    }
+
+    // Calculate dynamic slide distance to avoid overlap (reduced spacing)
+    const float animationSpeed = 1.0f; // Extremely slow and gentle animation
+    float slideDistance = 18.0f; // Further reduced minimum distance between messages
+
+    // Calculate approximate height of the new message to ensure proper spacing
+    std::string tempMessage = message.length() > 50 ? message.substr(0, 47) + "..." : message;
+    const int maxCharsPerLine = 20;
+    size_t lines = 1;
+    size_t pos = 0;
+    while (pos < tempMessage.length()) {
+        size_t lineLength = std::min(static_cast<size_t>(maxCharsPerLine), tempMessage.length() - pos);
+        if (pos + lineLength < tempMessage.length() && tempMessage[pos + lineLength] != ' ') {
+            size_t lastSpace = tempMessage.rfind(' ', pos + lineLength);
+            if (lastSpace != std::string::npos && lastSpace > pos && (pos + lineLength - lastSpace) <= maxCharsPerLine / 2) {
+                lineLength = lastSpace - pos;
+            }
+        }
+        pos += lineLength;
+        while (pos < tempMessage.length() && tempMessage[pos] == ' ') {
+            pos++;
+        }
+        lines++;
+    }
+
+    // Calculate total height needed (approximate) - minimal padding
+    float approxMessageHeight = (lines - 1) * 14.0f + 16.0f; // Rough estimate
+    slideDistance = std::max(slideDistance, approxMessageHeight + 2.0f); // Minimal padding
+
+    // Make existing messages slide up and start fading
+    for (auto& existingMsg : m_chatMessages) {
+        existingMsg.targetY -= slideDistance;
+        existingMsg.isAnimating = true;
+        existingMsg.animationSpeed = animationSpeed;
+        existingMsg.animationTimer.restart();
+        existingMsg.isFading = true; // Start fading when new message arrives
+        existingMsg.fadeTimer.restart();
+    }
+
+    ChatMessage chatMsg;
+    chatMsg.mode = mode;
+
+    // Truncate message to 50 characters and add "..." if longer
+    const int maxMessageLength = 50;
+    std::string processedMessage = message;
+    if (message.length() > maxMessageLength) {
+        processedMessage = message.substr(0, maxMessageLength - 3) + "...";
+    }
+
+    chatMsg.message = processedMessage;
+    chatMsg.isNpcMode = isNpcMode;
+    chatMsg.speakColor = Color(r, g, b);
+    chatMsg.timer.restart();
+
+    // Animation setup for new message
+    chatMsg.currentY = 15.0f; // Start slightly below (will animate to target position)
+    chatMsg.targetY = -40.0f; // Final position (40 pixels above health bars - lowered by 10px)
+    chatMsg.animationSpeed = 3.0f; // Extremely gentle animation for new messages
+    chatMsg.isAnimating = true;
+    chatMsg.animationTimer.restart();
+    chatMsg.isFading = false; // New messages don't fade initially
+    chatMsg.fadeTimer.restart();
+    // staticText will be created during rendering if needed
+
+    m_chatMessages.push_back(chatMsg);
+
+    // Schedule removal of message after 2 seconds
+    uint32 creatureId = getId();
+    g_dispatcher.scheduleEvent([creatureId]() {
+        Creature::removeOldChatMessages(creatureId);
+    }, 2000); // 2 seconds
+}
+
+void Creature::removeOldChatMessages(uint32 creatureId)
+{
+    CreaturePtr creature = g_map.getCreatureById(creatureId);
+    if (creature && !creature->m_chatMessages.empty()) {
+        creature->m_chatMessages.pop_front();
+    }
 }
 
 
