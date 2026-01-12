@@ -12,6 +12,7 @@ Module
   load-later:
     - client_styles
     - client_locales
+    - game_monster_icons
     - client_topmenu
     - client_background
     - client_textedit

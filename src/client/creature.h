@@ -90,6 +90,7 @@ public:
     void setEmblemTexture(const std::string& filename);
     void setTypeTexture(const std::string& filename);
     void setIconTexture(const std::string& filename);
+    void setMonsterIconTexture(const std::string& filename);
     void setPassable(bool passable) { m_passable = passable; }
     void setSpeedFormula(double speedA, double speedB, double speedC);
 
@@ -258,6 +259,7 @@ protected:
     TexturePtr m_emblemTexture;
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
+    TexturePtr m_monsterIconTexture;
     stdext::boolean<true> m_showShieldTexture;
     stdext::boolean<false> m_shieldBlink;
     stdext::boolean<false> m_passable;

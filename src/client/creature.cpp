@@ -418,6 +418,14 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
             m_nameCache.draw(textRect, fillColor);
         }
 
+        // Draw monster icon at the end of the name
+        if (m_monsterIconTexture) {
+            Size nameSize = m_nameCache.getTextSize();
+            Point iconPos = textRect.topLeft() + Point(nameSize.width() + 2, -2); // Right of name + small offset
+            Rect iconRect = Rect(iconPos, m_monsterIconTexture->getSize());
+            g_drawQueue->addTexturedRect(iconRect, m_monsterIconTexture, Rect(0, 0, m_monsterIconTexture->getSize()));
+        }
+
         if (m_titleCache.hasText()) {
             Size titleSize = m_titleCache.getTextSize();
             Point textCenter = textRect.topCenter();
@@ -1199,6 +1207,11 @@ void Creature::setTypeTexture(const std::string& filename)
 void Creature::setIconTexture(const std::string& filename)
 {
     m_iconTexture = g_textures.getTexture(filename);
+}
+
+void Creature::setMonsterIconTexture(const std::string& filename)
+{
+    m_monsterIconTexture = g_textures.getTexture(filename);
 }
 
 void Creature::setSpeedFormula(double speedA, double speedB, double speedC)

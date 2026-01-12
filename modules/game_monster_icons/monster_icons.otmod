@@ -1,0 +1,9 @@
+Module
+  name: game_monster_icons
+  description: Monster Icons Module
+  author: AI Assistant
+  website:
+  sandboxed: true
+  scripts: [ monster_icons ]
+  @onLoad: init()
+  @onUnload: terminate()
