@@ -14,12 +14,23 @@ function init()
 end
 
 function onGameStart()
-  ProtocolGame.registerExtendedOpcode(OPCODE_MONSTER_ICON, onMonsterIconResponse)
+  -- Safely register the opcode, checking if it's already registered
+  if not pcall(function()
+    ProtocolGame.registerExtendedOpcode(OPCODE_MONSTER_ICON, onMonsterIconResponse)
+  end) then
+    -- If registration failed (opcode already taken), try to unregister first then re-register
+    pcall(function()
+      ProtocolGame.unregisterExtendedOpcode(OPCODE_MONSTER_ICON)
+      ProtocolGame.registerExtendedOpcode(OPCODE_MONSTER_ICON, onMonsterIconResponse)
+    end)
+  end
 end
 
 function terminate()
-  -- Unregister extended opcode
-  ProtocolGame.unregisterExtendedOpcode(OPCODE_MONSTER_ICON)
+  -- Safely unregister extended opcode
+  pcall(function()
+    ProtocolGame.unregisterExtendedOpcode(OPCODE_MONSTER_ICON)
+  end)
 
   -- Disconnect game events
   disconnect(g_game, { onGameStart = onGameStart })

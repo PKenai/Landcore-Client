@@ -47,6 +47,38 @@ function init()
   connect(g_game, {
     onGameStart = function()
       if ProtocolGame then
+        -- Safely register the opcode
+        pcall(function()
+          ProtocolGame.registerExtendedOpcode(GameOutfitShaders, function(protocol, opcode, buffer)
+            local player = g_game.getLocalPlayer()
+            if player then
+              if buffer == "" then
+                -- Remove shader
+                player:setOutfitShader("")
+              else
+                -- Apply shader
+                player:setOutfitShader(buffer)
+              end
+            end
+          end)
+        end)
+      end
+    end,
+    onGameEnd = function()
+      if ProtocolGame then
+        -- Safely unregister the opcode
+        pcall(function()
+          ProtocolGame.unregisterExtendedOpcode(GameOutfitShaders)
+        end)
+      end
+    end
+  })
+
+  -- Register on game start if already online
+  if g_game.isOnline() then
+    if ProtocolGame then
+      -- Safely register the opcode
+      pcall(function()
         ProtocolGame.registerExtendedOpcode(GameOutfitShaders, function(protocol, opcode, buffer)
           local player = g_game.getLocalPlayer()
           if player then
@@ -59,29 +91,6 @@ function init()
             end
           end
         end)
-      end
-    end,
-    onGameEnd = function()
-      if ProtocolGame then
-        ProtocolGame.unregisterExtendedOpcode(GameOutfitShaders)
-      end
-    end
-  })
-
-  -- Register on game start if already online
-  if g_game.isOnline() then
-    if ProtocolGame then
-      ProtocolGame.registerExtendedOpcode(GameOutfitShaders, function(protocol, opcode, buffer)
-        local player = g_game.getLocalPlayer()
-        if player then
-          if buffer == "" then
-            -- Remove shader
-            player:setOutfitShader("")
-          else
-            -- Apply shader
-            player:setOutfitShader(buffer)
-          end
-        end
       end)
     end
   end

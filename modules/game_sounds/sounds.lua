@@ -1,6 +1,4 @@
-local soundOpcode = 135
-
-local soundOpcode = 135
+local soundOpcode = 140
 
 function init()
     connect(g_game, { onGameStart = onGameStart })
@@ -8,10 +6,23 @@ end
 
 function terminate()
     disconnect(g_game, { onGameStart = onGameStart })
+    -- Safely unregister extended opcode
+    pcall(function()
+        ProtocolGame.unregisterExtendedOpcode(soundOpcode)
+    end)
 end
 
 function onGameStart()
-    ProtocolGame.registerExtendedOpcode(soundOpcode, onExtendedOpcode)
+    -- Safely register the opcode, checking if it's already registered
+    if not pcall(function()
+        ProtocolGame.registerExtendedOpcode(soundOpcode, onExtendedOpcode)
+    end) then
+        -- If registration failed (opcode already taken), try to unregister first then re-register
+        pcall(function()
+            ProtocolGame.unregisterExtendedOpcode(soundOpcode)
+            ProtocolGame.registerExtendedOpcode(soundOpcode, onExtendedOpcode)
+        end)
+    end
 end
 
 function onExtendedOpcode(protocol, opcode, buffer)
