@@ -8,7 +8,7 @@ TabBarVerticalButton < UIButton
   image-offset-y: 5
   text-align: Top-Left
   text-offset: 20 17
-  font: poppins-14-px
+  font: verdana-11px-antialised
   icon-align: right
   icon-offset-x: -15
   icon-offset-y: 5
@@ -35,7 +35,7 @@ OptionCheckBox < UICheckBox
   text-align: center
   text-offset: 105 -2
   !text: tr('Off')
-  font: poppins-14-px
+  font: verdana-11px-antialised
   color: #dfdfdf
   image-color: #dfdfdfff
   image-rect: 0 0 34 22
@@ -192,7 +192,7 @@ UIWindow
   !text: tr('Options')
   text-align: Top-Left
   text-offset: 42 15
-  font: poppins-14-px
+  font: verdana-11px-antialised
   size: 910 704
   image-source: settings/background
   image-border-top: 6
@@ -213,7 +213,7 @@ UIWindow
     anchors.top: parent.top
     margin: 15 0 0 91
     color: #77f558
-    font: poppins-14-px
+    font: verdana-11px-antialised
     text: (O)
 
   UIWidget

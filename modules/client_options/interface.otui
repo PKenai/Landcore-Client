@@ -12,7 +12,7 @@ OptionPanel
       !text: tr('Show connection ping')
       !tooltip: tr('Display connection speed to the server (milliseconds)')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: displayCreatureShadows
@@ -25,7 +25,7 @@ OptionPanel
       size: 275 30
       !text: tr('Display creature shadows')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: displayNames
@@ -38,7 +38,7 @@ OptionPanel
       size: 275 30
       !text: tr('Show player mana bar')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: displayHealthOnTop
@@ -53,7 +53,7 @@ OptionPanel
       size: 275 30
       !text: tr('Display creature health bars above texts')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: highlightThingsUnderCursor
@@ -66,14 +66,14 @@ OptionPanel
       size: 275 30
       !text: tr('Highlight things under cursor')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   Label
     margin-top: 3
     id: crosshairLabel
     margin: 27 0 0 8
     !text: tr("Crosshair")
-    font: poppins-14-px
+    font: verdana-11px-antialised
 
   OptionComboBox
     id: crosshair
@@ -83,7 +83,7 @@ OptionPanel
     image-source: settings/combobox
     image-size: 200 40
     opacity: 0.5
-    font: poppins-14-px
+    font: verdana-11px-antialised
     @onMousePress: |
       addEvent(function()
       local menuStyle = self:getStyleName()
@@ -108,7 +108,7 @@ OptionPanel
       self:setOn(true)
       menu:setWidth(200)
       menu:setImageSource('settings/comboboxActive')
-      menu:setFont('poppins-14-px')
+      menu:setFont('verdana-11px-antialised')
       end)
     @onOptionChange: modules.client_options.setOption(self:getId(), self.currentIndex)
     @onSetup: |
@@ -118,13 +118,13 @@ OptionPanel
 
   Label
     id: floorFadingLabel
-    font: poppins-14-px
+    font: verdana-11px-antialised
     margin: 6 0 0 8
 
   UIWidget
     id: floorFadingBG
     height: 15
-    font: poppins-14-px
+    font: verdana-11px-antialised
     text: Floor Fading
     text-align: left
     text-offset: 4 0
@@ -144,7 +144,7 @@ OptionPanel
       anchors.right: parent.right
       width: 50
       margin: 0 13 0 0
-      font: poppins-14-px
+      font: verdana-11px-antialised
       color: #77f558
 
   Label
@@ -152,4 +152,4 @@ OptionPanel
     margin-top: 6
     margin: 5 0 0 8
     !text: (tr('Floor fading doesn\'t work with enabled light'))
-    font: poppins-14-px
+    font: verdana-11px-antialised

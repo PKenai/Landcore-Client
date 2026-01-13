@@ -10,7 +10,7 @@ OptionPanel
       size: 275 30
       !text: tr('Show info messages in console')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: showEventMessagesInConsole
@@ -23,7 +23,7 @@ OptionPanel
       size: 275 30
       !text: tr('Show event messages in console')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: showStatusMessagesInConsole
@@ -36,7 +36,7 @@ OptionPanel
       size: 275 30
       !text: tr('Show status messages in console')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: showTimestampsInConsole
@@ -49,7 +49,7 @@ OptionPanel
       size: 275 30
       !text: tr('Show timestamps in console')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: showPrivateMessagesInConsole
@@ -62,7 +62,7 @@ OptionPanel
       size: 275 30
       !text: tr('Show private messages in console')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: showPrivateMessagesOnScreen
@@ -75,4 +75,4 @@ OptionPanel
       size: 275 30
       !text: tr('Show private messages on screen')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised

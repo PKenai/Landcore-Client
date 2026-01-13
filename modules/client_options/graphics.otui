@@ -1,13 +1,13 @@
 OptionPanel
   Label
     text-wrap: false
-    font: poppins-14-px
+    font: verdana-11px-antialised
     @onSetup: |
       self:setText(tr("GPU: ") .. g_graphics.getRenderer())      
 
   Label
     text-wrap: false
-    font: poppins-14-px
+    font: verdana-11px-antialised
     @onSetup: |
       self:setText(tr("Version: ") .. g_graphics.getVersion())      
 
@@ -27,7 +27,7 @@ OptionPanel
       !text: tr('Enable vertical synchronization')
       !tooltip: tr('Limits FPS (usually to 60)')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: showFps
@@ -40,7 +40,7 @@ OptionPanel
       size: 275 30
       !text: tr('Show frame rate')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: enableLights
@@ -53,7 +53,7 @@ OptionPanel
       size: 275 30
       !text: tr('Enable lights')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: fullscreen
@@ -67,20 +67,20 @@ OptionPanel
       size: 275 30
       !text: tr('Fullscreen')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
 
   Label
     margin: 27 0 0 6
     id: optimizationLevelLabel
-    font: poppins-14-px
+    font: verdana-11px-antialised
     !text: tr("Optimization level")
 
   OptionComboBox
     id: optimizationLevel
     image-source: settings/combobox
     image-size: 200 40
-    font: poppins-14-px
+    font: verdana-11px-antialised
     opacity: 0.5
     @onMousePress: |
       addEvent(function()
@@ -120,13 +120,13 @@ OptionPanel
     !text: tr('High/Maximum optimization level may cause visual defects.')
     margin: 5 0 0 4
     height: 30
-    font: poppins-14-px
+    font: verdana-11px-antialised
 
   UIWidget
     id: backgroundFrameRateBG
     margin: 10 0 0 0
     height: 15
-    font: poppins-14-px
+    font: verdana-11px-antialised
     text: Game framerate limit
     text-align: left
     text-offset: 2 -2
@@ -146,7 +146,7 @@ OptionPanel
       anchors.right: parent.right
       width: 35
       margin: 0 35 0 0
-      font: poppins-14-px
+      font: verdana-11px-antialised
       color: #77f558
       @onSetup: |
         local value = modules.client_options.getOption('backgroundFrameRate')
@@ -160,7 +160,7 @@ OptionPanel
     id: ambientLightBG
     margin: 27 0 0 0
     height: 15
-    font: poppins-14-px
+    font: verdana-11px-antialised
     text: Ambient light
     text-align: left
     text-offset: 2 -8
@@ -180,7 +180,7 @@ OptionPanel
       anchors.right: parent.right
       width: 35
       margin: 0 29 0 0
-      font: poppins-14-px
+      font: verdana-11px-antialised
       color: #77f558
       @onSetup: |
         local value = modules.client_options.getOption('ambientLight')
@@ -190,7 +190,7 @@ OptionPanel
     id: effectOpacityBG
     margin: 27 0 0 0
     height: 15
-    font: poppins-14-px
+    font: verdana-11px-antialised
     text: Effect Opacity
     text-align: left
     text-offset: 2 -8
@@ -210,7 +210,7 @@ OptionPanel
       anchors.right: parent.right
       width: 35
       margin: 0 29 0 0
-      font: poppins-14-px
+      font: verdana-11px-antialised
       color: #77f558
       @onSetup: |
         local value = modules.client_options.getOption('effectOpacity')
@@ -223,7 +223,7 @@ OptionPanel
     text-align: left
     text-wrap: true
     !text: tr("If you have FPS issues:\n- Use OpenGL version (_gl)\n- Disable vertical synchronization\n- Set higher optimization level\n- Lower screen resolution\nOr report it on forum: http://otclient.net")
-    font: poppins-14-px
+    font: verdana-11px-antialised
     $mobile:
       visible: false
 

@@ -14,7 +14,7 @@ OptionPanel
       size: 275 30
       !text: tr('Classic control')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: displayText
@@ -27,7 +27,7 @@ OptionPanel
       size: 275 30
       !text: tr('Display text messages')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: wsadWalking
@@ -43,7 +43,7 @@ OptionPanel
       !text: tr('Enable WSAD walking')
       text-offset: 0 5
       !tooltip: tr('Disable chat and allow walk using WSAD keys')
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: smartWalk
@@ -57,19 +57,8 @@ OptionPanel
       !text: tr('Enable smart walking')
       text-offset: 0 5
       !tooltip: tr('Will detect when to use diagonal step based on the\nkeys you are pressing')
-      font: poppins-14-px
+      font: verdana-11px-antialised
       
   Panel
     margin: 27 0 0 4
     height: 30
-
-    UIButton
-      id: changeLocale
-      !text: tr('Change language')
-      font: poppins-14-px-semibold
-      image-source: buttons/smallbutton
-      @onClick: modules.client_locales.createWindow()
-      anchors.left: parent.left
-      anchors.top: parent.top
-      size: 160 50
-      image-border: 11

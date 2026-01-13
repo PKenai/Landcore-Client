@@ -10,7 +10,7 @@ OptionPanel
       size: 275 30
       !text: tr('Enable audio')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: enableMusicSound
@@ -23,13 +23,13 @@ OptionPanel
       size: 275 30
       !text: tr('Enable music sound')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   UIWidget
     id: musicSoundVolumeBG
     margin: 27 0 0 2
     height: 15
-    font: poppins-14-px
+    font: verdana-11px-antialised
     text: Music volume
     text-align: left
     text-offset: 2 -2
@@ -49,7 +49,7 @@ OptionPanel
       anchors.right: parent.right
       width: 35
       margin: 0 29 0 0
-      font: poppins-14-px
+      font: verdana-11px-antialised
       color: #77f558
       @onSetup: |
         local value = modules.client_options.getOption('musicSoundVolume')

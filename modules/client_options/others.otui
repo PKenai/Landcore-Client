@@ -12,7 +12,7 @@ OptionPanel
       !text: tr('Show online players')
       !tooltip: tr('Display the number of online players in the upper left corner')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
 
   OptionCheckBox
     id: showPlayerShadows
@@ -26,4 +26,4 @@ OptionPanel
       !text: tr('Show player shadows')
       !tooltip: tr('Display shadows under the player character')
       text-offset: 0 5
-      font: poppins-14-px
+      font: verdana-11px-antialised
