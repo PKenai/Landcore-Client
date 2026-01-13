@@ -50,13 +50,34 @@ function init()
   topMenu = g_ui.createWidget('TopMenu', g_ui.getRootWidget())
   topMenu:hide() -- Hide topmenu by default
   g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
-  
+
+  -- Register extended opcode handler for online players count
+  ProtocolGame.registerExtendedOpcode(0x04, onOnlinePlayersOpcode)
+
   if g_game.isOnline() then
     scheduleEvent(online, 10)
   end
-  
-  updateFps()  
+
+  updateFps()
   updateStatus()
+
+  -- Initialize online players display
+  addEvent(function()
+    local topMenu = getTopMenu()
+    if topMenu then
+      local label = topMenu:recursiveGetChildById('onlinePlayersLabel')
+      if label then
+        if modules.client_options.getOption('showOnlinePlayers') then
+          label:show()
+          label:setText("Online: ??")
+          label:setColor('yellow')
+
+        else
+          label:hide()
+        end
+      end
+    end
+  end)
 end
 
 function terminate()
@@ -65,7 +86,7 @@ function terminate()
                        onPingBack = updatePing })
   removeEvent(fpsUpdateEvent)
   removeEvent(statusUpdateEvent)
-  
+
   g_keyboard.unbindKeyDown('Ctrl+Shift+T')
   topMenu:destroy()
 end
@@ -87,7 +108,22 @@ function online()
       if modules.client_options.getOption('showPing') and (g_game.getFeature(GameClientPing) or g_game.getFeature(GameExtendedClientPing)) then
         topMenu.pingLabel:show()
       else
-        topMenu.pingLabel:hide()      
+        topMenu.pingLabel:hide()
+      end
+    end)
+  end
+
+  if topMenu.onlinePlayersLabel then
+    addEvent(function()
+      if modules.client_options.getOption('showOnlinePlayers') then
+        topMenu.onlinePlayersLabel:show()
+        -- Force initial display
+        if topMenu.onlinePlayersLabel:getText() == "" then
+          topMenu.onlinePlayersLabel:setText("Online: ??")
+          topMenu.onlinePlayersLabel:setColor('yellow')
+        end
+      else
+        topMenu.onlinePlayersLabel:hide()
       end
     end)
   end
@@ -105,6 +141,17 @@ function offline()
   if topMenu.pingLabel then
     topMenu.pingLabel:hide()
   end
+
+  -- Show online players label even when offline
+  addEvent(function()
+    local label = getTopMenu() and getTopMenu():recursiveGetChildById('onlinePlayersLabel')
+    if label and modules.client_options.getOption('showOnlinePlayers') then
+      label:show()
+      label:setText("Online: ??")
+      label:setColor('yellow')
+    end
+  end)
+
   updateStatus()
 end
 
@@ -120,7 +167,7 @@ function updatePing(ping)
   if g_proxy and g_proxy.getPing() > 0 then
     ping = g_proxy.getPing()
   end
-  
+
   local text = 'Ping: '
   local color
   if ping < 0 then
@@ -140,6 +187,7 @@ function updatePing(ping)
   topMenu.pingLabel:setText(text)
 end
 
+
 function setPingVisible(enable)
   if not topMenu.pingLabel then return end
   topMenu.pingLabel:setVisible(enable)
@@ -148,6 +196,11 @@ end
 function setFpsVisible(enable)
   if not topMenu.fpsLabel then return end
   topMenu.fpsLabel:setVisible(enable)
+end
+
+function setOnlinePlayersVisible(enable)
+  if not topMenu.onlinePlayersLabel then return end
+  topMenu.onlinePlayersLabel:setVisible(enable)
 end
 
 function addLeftButton(id, description, icon, callback, front, index)
@@ -282,4 +335,33 @@ function updateStatus()
     end
     statusUpdateEvent = scheduleEvent(updateStatus, 60000)
   end)
+end
+
+function onOnlinePlayersOpcode(protocol, opcode, buffer)
+  if opcode ~= 0x04 then return end
+
+  local onlineCount = tonumber(buffer)
+  if not onlineCount then return end
+
+  -- Update topMenu label
+  if topMenu and topMenu.onlinePlayersLabel then
+    if onlineCount > 0 then
+      topMenu.onlinePlayersLabel:setText("Online: " .. onlineCount)
+      topMenu.onlinePlayersLabel:setColor('green')
+    else
+      topMenu.onlinePlayersLabel:setText("Online: ??")
+      topMenu.onlinePlayersLabel:setColor('yellow')
+    end
+  end
+
+  -- Update game_stats label if topMenu is hidden
+  if modules.game_stats and modules.game_stats.ui and modules.game_stats.ui.onlinePlayers then
+    if onlineCount > 0 then
+      modules.game_stats.ui.onlinePlayers:setText("Online: " .. onlineCount)
+      modules.game_stats.ui.onlinePlayers:setColor('green')
+    else
+      modules.game_stats.ui.onlinePlayers:setText("Online: ??")
+      modules.game_stats.ui.onlinePlayers:setColor('yellow')
+    end
+  end
 end

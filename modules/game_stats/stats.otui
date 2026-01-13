@@ -15,3 +15,7 @@ UIWidget
   Label
     id: ping
     font: verdana-11px-rounded
+
+  Label
+    id: onlinePlayers
+    font: verdana-11px-rounded

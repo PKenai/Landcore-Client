@@ -3,6 +3,8 @@ local defaultOptions = {
   vsync = true,
   showFps = true,
   showPing = true,
+  showOnlinePlayers = true,
+  showPlayerShadows = true,
   fullscreen = false,
   classicView = false,--not g_app.isMobile(),
   cacheMap = g_app.isMobile(),
@@ -57,6 +59,7 @@ local interfacePanel
 local consolePanel
 local graphicsPanel
 local soundPanel
+local othersPanel
 extrasPanel = nil
 local audioButton
 
@@ -93,6 +96,9 @@ function init()
 
   audioPanel = g_ui.loadUI('audio')
   optionsTabBar:addTab(tr('Audio'), audioPanel, '/modules/client_options/settings/iconpanel')
+
+  othersPanel = g_ui.loadUI('others')
+  optionsTabBar:addTab(tr('Others'), othersPanel, '/modules/client_options/settings/iconpanel')
 
   extrasPanel = g_ui.createWidget('OptionPanel')
   for _, v in ipairs(g_extras.getAll()) do
@@ -228,6 +234,13 @@ function setOption(key, value, force)
     if modules.game_stats and modules.game_stats.ui.ping then
       modules.game_stats.ui.ping:setVisible(value)
     end
+  elseif key == 'showOnlinePlayers' then
+    modules.client_topmenu.setOnlinePlayersVisible(value)
+    if modules.game_stats and modules.game_stats.ui.onlinePlayers then
+      modules.game_stats.ui.onlinePlayers:setVisible(value)
+    end
+  elseif key == 'showPlayerShadows' then
+    gameMapPanel:setDrawCreatureShadows(value)
   elseif key == 'fullscreen' then
     g_window.setFullscreen(value)
   elseif key == 'enableAudio' then

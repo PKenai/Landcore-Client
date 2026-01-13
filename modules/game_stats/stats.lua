@@ -10,6 +10,9 @@ function init()
   if not modules.client_options.getOption("showFps") then
     ui.ping:hide()
   end
+  if not modules.client_options.getOption("showOnlinePlayers") then
+    ui.onlinePlayers:hide()
+  end
   
   updateEvent = scheduleEvent(update, 200)
 end
