@@ -250,10 +250,6 @@ function setOption(key, value, force)
     audioPanel:getChildById('musicSoundVolumeBG'):getChildById('musicSoundVolumeLabelBG'):setText(tr('%d', value))
 	local valueScroll = ((value*200)/100)
 	audioPanel:getChildById('musicSoundVolumeBG'):getChildById('musicSoundVolume'):getChildById('activeScroll'):setWidth(valueScroll)
-    modules.game_healthinfo.healthCircle:setVisible(value)
-    modules.game_healthinfo.healthCircleFront:setVisible(value)
-    modules.game_healthinfo.manaCircle:setVisible(value)
-    modules.game_healthinfo.manaCircleFront:setVisible(value)
   elseif key == 'backgroundFrameRate' then
     local text, v = value, value
     if value <= 0 or value >= 201 then text = 'max' v = 0 end
