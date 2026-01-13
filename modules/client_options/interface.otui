@@ -1,157 +1,115 @@
 OptionPanel
-  Label
-    width: 130
-    id: layoutLabel
-    !text: tr("Layout (change requries client restart)")
-    $mobile:
-      visible: false
-  
-  ComboBox
-    id: layout
-    margin-top: 3
-    margin-right: 2
-    margin-left: 2
-    $mobile:
-      visible: false
-    @onOptionChange: modules.client_options.setOption(self:getId(), self:getCurrentOption().text)
-    @onSetup: |
-      self:addOption("Default")
-      for _, file in ipairs(g_resources.listDirectoryFiles("/layouts", false, true)) do
-        if g_resources.directoryExists("/layouts/" .. file) then
-          self:addOption(file:gsub("^%l", string.upper))
-        end
-      end
 
-  OptionCheckBox
-    id: classicView
-    !text: tr('Classic view')
-    margin-top: 5
-    
-    $mobile:
-      visible: false
-
-  OptionCheckBox
-    id: cacheMap
-    !text: tr('Cache map (for non-classic view)')
-
-    $mobile:
-      visible: false
-    
   OptionCheckBox
     id: showPing
-    !text: tr('Show connection ping')
-    !tooltip: tr('Display connection speed to the server (milliseconds)')
+    margin: 27 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show connection ping')
+      !tooltip: tr('Display connection speed to the server (milliseconds)')
+      text-offset: 0 5
+      font: poppins-14-px
+
+  OptionCheckBox
+    id: displayCreatureShadows
+    margin: 27 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Display creature shadows')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: displayNames
-    !text: tr('Display creature names')
+    margin: 27 0 0 8
 
-  OptionCheckBox
-    id: displayHealth
-    !text: tr('Display creature health bars')
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show player mana bar')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: displayHealthOnTop
-    !text: tr('Display creature health bars above texts')
+    margin: 27 0 0 8
     $mobile:
       visible: false
 
-  OptionCheckBox
-    id: hidePlayerBars
-    !text: tr('Show player health bar')
-
-  OptionCheckBox
-    id: displayMana
-    !text: tr('Show player mana bar')
-    $mobile:
-      visible: false
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Display creature health bars above texts')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: highlightThingsUnderCursor
-    !text: tr('Highlight things under cursor')
+    margin: 27 0 0 8
 
-  Panel
-    height: 40
-    margin-top: 3
-    
-    Label
-      width: 90
+    UILabel
+      id: label
       anchors.left: parent.left
-      anchors.top: parent.top
-      id: leftPanelsLabel
-      !text: tr("Left panels")
-
-    Label
-      width: 90
-      anchors.left: prev.right
-      anchors.top: prev.top
-      id: rightPanelsLabel
-      !text: tr("Right panels")
-
-    Label
-      width: 130
-      anchors.left: prev.right
-      anchors.top: prev.top
-      id: backpackPanelLabel
-      !text: tr("Container's panel")
-      !tooltip: tr("Open new containers in selected panel")
-
-    ComboBox
-      id: leftPanels
-      anchors.left: leftPanelsLabel.left
-      anchors.right: leftPanelsLabel.right
-      anchors.top: leftPanelsLabel.bottom
-      margin-top: 3
-      margin-right: 20
-      @onOptionChange: modules.client_options.setOption(self:getId(), self.currentIndex)
-      @onSetup: |
-        self:addOption("0")
-        self:addOption("1")
-        self:addOption("2")
-        self:addOption("3")
-        self:addOption("4")
-
-    ComboBox
-      id: rightPanels
-      anchors.left: rightPanelsLabel.left
-      anchors.right: rightPanelsLabel.right
-      anchors.top: rightPanelsLabel.bottom
-      margin-top: 3
-      margin-right: 20
-      @onOptionChange: modules.client_options.setOption(self:getId(), self.currentIndex)
-      @onSetup: |
-        self:addOption("1")
-        self:addOption("2")
-        self:addOption("3")
-        self:addOption("4")
-
-    ComboBox
-      id: containerPanel
-      anchors.left: backpackPanelLabel.left
-      anchors.right: backpackPanelLabel.right
-      anchors.top: backpackPanelLabel.bottom
-      margin-top: 3
-      @onOptionChange: modules.client_options.setOption(self:getId(), self.currentIndex)
-      @onSetup: |
-        self:addOption("1st left panel")
-        self:addOption("2nd left panel")
-        self:addOption("3rd left panel")
-        self:addOption("4th left panel")
-        self:addOption("1st right panel")
-        self:addOption("2nd right panel")
-        self:addOption("3rd right panel")
-        self:addOption("4th right panel")
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Highlight things under cursor')
+      text-offset: 0 5
+      font: poppins-14-px
 
   Label
     margin-top: 3
     id: crosshairLabel
+    margin: 27 0 0 8
     !text: tr("Crosshair")
-    
-  ComboBox
+    font: poppins-14-px
+
+  OptionComboBox
     id: crosshair
-    margin-top: 3
-    margin-right: 2
-    margin-left: 2
+    margin: 2 0 0 2
+    color: white
+    text-offset: 18 0
+    image-source: settings/combobox
+    image-size: 200 40
+    opacity: 0.5
+    font: poppins-14-px
+    @onMousePress: |
+      addEvent(function()
+      local menuStyle = self:getStyleName()
+      if self:getStyleName() == 'OptionComboBox' then menuStyle = 'ComboBox' end
+      local menu
+      if self.menuScroll then
+      menu = g_ui.createWidget(''..menuStyle..'PopupScrollMenu')
+      menu:setHeight(self.menuHeight)
+      if self.menuScrollStep > 0 then
+      menu:setScrollbarStep(self.menuScrollStep)
+      end
+      else
+      menu = g_ui.createWidget(''..menuStyle..'PopupMenu')
+      end
+      menu:setId(self:getId() .. 'PopupMenu')
+      for i,v in ipairs(self.options) do
+      menu:addOption(v.text, function() self:setCurrentOption(v.text) end)
+      end
+      menu:setWidth(self:getWidth())
+      menu:display({ x = self:getX(), y = self:getY() + self:getHeight() })
+      connect(menu, { onDestroy = function() self:setOn(false) end })
+      self:setOn(true)
+      menu:setWidth(200)
+      menu:setImageSource('settings/comboboxActive')
+      menu:setFont('poppins-14-px')
+      end)
     @onOptionChange: modules.client_options.setOption(self:getId(), self.currentIndex)
     @onSetup: |
       self:addOption("None")
@@ -160,18 +118,38 @@ OptionPanel
 
   Label
     id: floorFadingLabel
-    margin-top: 6
-    @onSetup: |
-      local value = modules.client_options.getOption('floorFading')
-      self:setText(tr('Floor fading: %s ms', value))
+    font: poppins-14-px
+    margin: 6 0 0 8
 
-  OptionScrollbar
-    id: floorFading
-    margin-top: 3
-    minimum: 0
-    maximum: 2000
+  UIWidget
+    id: floorFadingBG
+    height: 15
+    font: poppins-14-px
+    text: Floor Fading
+    text-align: left
+    text-offset: 4 0
+
+    OptionScrollbar
+      id: floorFading
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin: 0 0 0 105
+      width: 220
+      minimum: 0
+      maximum: 2000
+
+    Label
+      id: floorFadingLabelBG
+      anchors.top: parent.top
+      anchors.right: parent.right
+      width: 50
+      margin: 0 13 0 0
+      font: poppins-14-px
+      color: #77f558
 
   Label
     id: floorFadingLabel2
     margin-top: 6
+    margin: 5 0 0 8
     !text: (tr('Floor fading doesn\'t work with enabled light'))
+    font: poppins-14-px

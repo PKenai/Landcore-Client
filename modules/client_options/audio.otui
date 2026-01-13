@@ -1,36 +1,57 @@
 OptionPanel
   OptionCheckBox
     id: enableAudio
-    !text: tr('Enable audio')
+    margin: 0 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Enable audio')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: enableMusicSound
-    !text: tr('Enable music sound')
+    margin: 27 0 0 8
 
-  Label
-    id: musicSoundVolumeLabel
-    !text: tr('Music volume: %d', 100)
-    margin-top: 6
-    @onSetup: |
-      local value = modules.client_options.getOption('musicSoundVolume')
-      self:setText(tr('Music volume: %d', value))
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Enable music sound')
+      text-offset: 0 5
+      font: poppins-14-px
 
-  OptionScrollbar
-    id: musicSoundVolume
-    margin-top: 3
-    minimum: 0
-    maximum: 100
+  UIWidget
+    id: musicSoundVolumeBG
+    margin: 27 0 0 2
+    height: 15
+    font: poppins-14-px
+    text: Music volume
+    text-align: left
+    text-offset: 2 -2
 
-  Label
-    id: botSoundVolumeLabel
-    !text: tr('Bot sound volume: %d', 100)
-    margin-top: 6
-    @onSetup: |
-      local value = modules.client_options.getOption('botSoundVolume')
-      self:setText(tr('Bot sound volume: %d', value))
+    OptionScrollbar
+      id: musicSoundVolume
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin: 0 0 0 105
+      width: 220
+      minimum: 0
+      maximum: 100
 
-  OptionScrollbar
-    id: botSoundVolume
-    margin-top: 3
-    minimum: 0
-    maximum: 100
+    Label
+      id: musicSoundVolumeLabelBG
+      anchors.top: parent.top
+      anchors.right: parent.right
+      width: 35
+      margin: 0 29 0 0
+      font: poppins-14-px
+      color: #77f558
+      @onSetup: |
+        local value = modules.client_options.getOption('musicSoundVolume')
+        self:setText(tr('%d', value))
+

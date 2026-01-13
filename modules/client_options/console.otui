@@ -1,28 +1,78 @@
 OptionPanel
   OptionCheckBox
     id: showInfoMessagesInConsole
-    !text: tr('Show info messages in console')
+    margin: 0 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show info messages in console')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: showEventMessagesInConsole
-    !text: tr('Show event messages in console')
+    margin: 27 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show event messages in console')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: showStatusMessagesInConsole
-    !text: tr('Show status messages in console')
+    margin: 27 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show status messages in console')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: showTimestampsInConsole
-    !text: tr('Show timestamps in console')
+    margin: 27 0 0 8
 
-  OptionCheckBox
-    id: showLevelsInConsole
-    !text: tr('Show levels in console')
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show timestamps in console')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: showPrivateMessagesInConsole
-    !text: tr('Show private messages in console')
+    margin: 27 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show private messages in console')
+      text-offset: 0 5
+      font: poppins-14-px
 
   OptionCheckBox
     id: showPrivateMessagesOnScreen
-    !text: tr('Show private messages on screen')
+    margin: 27 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Show private messages on screen')
+      text-offset: 0 5
+      font: poppins-14-px

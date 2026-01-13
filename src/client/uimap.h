@@ -60,6 +60,7 @@ public:
     void setDrawLights(bool enable) { m_mapView->setDrawLights(enable); }
     void setDrawManaBar(bool enable) { m_mapView->setDrawManaBar(enable); }
     void setDrawPlayerBars(bool enable) { m_mapView->setDrawPlayerBars(enable); }
+    void setDrawCreatureShadows(bool enable) { m_mapView->setDrawCreatureShadows(enable); }
     void setAnimated(bool enable) { m_mapView->setAnimated(enable); }
     void setKeepAspectRatio(bool enable);
     void setMinimumAmbientLight(float intensity) { m_mapView->setMinimumAmbientLight(intensity); }
@@ -73,6 +74,7 @@ public:
     bool isDrawingHealthBarsOnTop() { return m_mapView->isDrawingHealthBarsOnTop(); }
     bool isDrawingLights() { return m_mapView->isDrawingLights(); }
     bool isDrawingManaBar() { return m_mapView->isDrawingManaBar(); }
+    bool isDrawingCreatureShadows() { return m_mapView->isDrawingCreatureShadows(); }
     bool isAnimating() { return m_mapView->isAnimating(); }
     bool isKeepAspectRatioEnabled() { return m_keepAspectRatio; }
     bool isLimitVisibleRangeEnabled() { return m_limitVisibleRange; }

@@ -24,16 +24,6 @@ OptionPanel
     id: topBar
     !text: tr('Show customizable top status bar')
 
-  OptionCheckBox
-    id: topHealtManaBar
-    !text: tr('Show player top health and mana bar')
-
-  OptionCheckBox
-    id: showHealthManaCircle
-    !text: tr('Show health and mana circle')
-    $mobile:
-      visible: false
-
   Label
     margin-top: 5
     text: Show Bottom Action Bars:

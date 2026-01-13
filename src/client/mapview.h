@@ -102,8 +102,10 @@ public:
 
     void setDrawManaBar(bool enable) { m_drawManaBar = enable; }
     bool isDrawingManaBar() { return m_drawManaBar; }
+    bool isDrawingCreatureShadows() { return m_drawCreatureShadows; }
 
     void setDrawPlayerBars(bool enable) { m_drawPlayerBars = enable; }
+    void setDrawCreatureShadows(bool enable) { m_drawCreatureShadows = enable; }
 
     void move(int x, int y);
 
@@ -154,6 +156,7 @@ private:
     stdext::boolean<false> m_drawHealthBarsOnTop;
     stdext::boolean<true> m_drawManaBar;
     bool m_drawPlayerBars = true;
+    stdext::boolean<true> m_drawCreatureShadows;
     stdext::boolean<true> m_smooth;
 
     stdext::timer m_fadingFloorTimers[Otc::MAX_Z + 1];
