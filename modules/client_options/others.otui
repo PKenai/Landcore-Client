@@ -27,3 +27,17 @@ OptionPanel
       !tooltip: tr('Display shadows under the player character')
       text-offset: 0 5
       font: verdana-11px-antialised
+
+  OptionCheckBox
+    id: enableSpeechBalloon
+    margin: 27 0 0 8
+
+    UILabel
+      id: label
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 275 30
+      !text: tr('Enable speech balloon')
+      !tooltip: tr('Display speech messages above creatures')
+      text-offset: 0 5
+      font: verdana-11px-antialised

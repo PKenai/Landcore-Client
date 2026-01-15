@@ -34,6 +34,7 @@ local defaultOptions = {
   displayHealthOnTop = false,
   highlightThingsUnderCursor = false,
   displayText = true,
+  enableSpeechBalloon = true,
   dontStretchShrink = false,
   turnDelay = 30,
   hotkeyDelay = 30,
@@ -306,6 +307,8 @@ function setOption(key, value, force)
     gameMapPanel:setDrawHealthBarsOnTop(value)
   elseif key == 'displayText' then
     gameMapPanel:setDrawTexts(value)
+  elseif key == 'enableSpeechBalloon' then
+    -- This will be handled in the creature drawing logic
   elseif key == 'dontStretchShrink' then
     addEvent(function()
       modules.game_interface.updateStretchShrink()

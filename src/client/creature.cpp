@@ -457,7 +457,9 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
         }
 
         // Draw chat messages that follow the creature (with smooth slide animation and fade out)
-        for (size_t i = 0; i < m_chatMessages.size(); ++i) {
+        // Only draw if speech balloon is enabled
+        if (modules.client_options.getOption('enableSpeechBalloon')) {
+            for (size_t i = 0; i < m_chatMessages.size(); ++i) {
             ChatMessage& chatMsg = m_chatMessages[i];
 
             // Update animation
@@ -580,6 +582,7 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
                     currentLineOffset += messageSize.height() + 2; // Add some spacing between lines
                 }
             }
+        }
         }
     }
 
