@@ -109,14 +109,8 @@ void Creature::draw(const Point& dest, bool animate, LightView* lightView)
 
     // Verificar se deve desenhar sombras de criaturas
     bool shouldDrawShadows = true;
-    if (g_ui.getRootWidget()) {
-        UIWidgetPtr gameMapPanel = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
-        if (gameMapPanel) {
-            UIMap* mapWidget = dynamic_cast<UIMap*>(gameMapPanel.get());
-            if (mapWidget) {
-                shouldDrawShadows = mapWidget->isDrawingCreatureShadows();
-            }
-        }
+    if (mapWidget) {
+        shouldDrawShadows = mapWidget->isDrawingCreatureShadows();
     }
 
     if (shouldDrawShadows) {
@@ -166,6 +160,13 @@ void Creature::drawOutfit(const Rect& destRect, Otc::Direction direction, const 
 
 void Creature::drawInformation(const Point& point, bool useGray, const Rect& parentRect, int drawFlags)
 {
+    // Get map widget for drawing options
+    UIMap* mapWidget = nullptr;
+    UIWidgetPtr gameMapPanel = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
+    if (gameMapPanel) {
+        mapWidget = dynamic_cast<UIMap*>(gameMapPanel.get());
+    }
+
     if (!g_game.getFeature(Otc::GameOldInformationBar) && g_game.getClientVersion() >= 760) {
         if (m_healthPercent < 1)  // creature is dead, we get rid of its information bar
             return;
@@ -458,7 +459,7 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
 
         // Draw chat messages that follow the creature (with smooth slide animation and fade out)
         // Only draw if speech balloon is enabled
-        if (modules.client_options.getOption('enableSpeechBalloon')) {
+        if (mapWidget->isDrawingSpeechBalloons()) {
             for (size_t i = 0; i < m_chatMessages.size(); ++i) {
             ChatMessage& chatMsg = m_chatMessages[i];
 

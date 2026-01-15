@@ -106,6 +106,8 @@ public:
 
     void setDrawPlayerBars(bool enable) { m_drawPlayerBars = enable; }
     void setDrawCreatureShadows(bool enable) { m_drawCreatureShadows = enable; }
+    void setDrawSpeechBalloons(bool enable) { m_drawSpeechBalloons = enable; }
+    bool isDrawingSpeechBalloons() { return m_drawSpeechBalloons; }
 
     void move(int x, int y);
 
@@ -157,6 +159,7 @@ private:
     stdext::boolean<true> m_drawManaBar;
     bool m_drawPlayerBars = true;
     stdext::boolean<true> m_drawCreatureShadows;
+    stdext::boolean<true> m_drawSpeechBalloons;
     stdext::boolean<true> m_smooth;
 
     stdext::timer m_fadingFloorTimers[Otc::MAX_Z + 1];

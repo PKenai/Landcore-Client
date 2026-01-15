@@ -308,7 +308,7 @@ function setOption(key, value, force)
   elseif key == 'displayText' then
     gameMapPanel:setDrawTexts(value)
   elseif key == 'enableSpeechBalloon' then
-    -- This will be handled in the creature drawing logic
+    gameMapPanel:setDrawSpeechBalloons(value)
   elseif key == 'dontStretchShrink' then
     addEvent(function()
       modules.game_interface.updateStretchShrink()

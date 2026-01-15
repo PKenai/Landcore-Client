@@ -75,6 +75,7 @@ public:
     bool isDrawingLights() { return m_mapView->isDrawingLights(); }
     bool isDrawingManaBar() { return m_mapView->isDrawingManaBar(); }
     bool isDrawingCreatureShadows() { return m_mapView->isDrawingCreatureShadows(); }
+    bool isDrawingSpeechBalloons() { return m_mapView->isDrawingSpeechBalloons(); }
     bool isAnimating() { return m_mapView->isAnimating(); }
     bool isKeepAspectRatioEnabled() { return m_keepAspectRatio; }
     bool isLimitVisibleRangeEnabled() { return m_limitVisibleRange; }
