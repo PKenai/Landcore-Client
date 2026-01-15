@@ -3,6 +3,7 @@ function init()
 
   -- ui shaders
   g_shaders.createShader("ui_life_simple", "/shaders/ui_life_simple_vertex", "/shaders/ui_life_simple_fragment")
+  g_shaders.createShader("ui_blood", "/shaders/ui_blood_vertex", "/shaders/ui_blood_fragment")
 
   -- map shaders
   g_shaders.createShader("map_default", "/shaders/map_default_vertex", "/shaders/map_default_fragment")  

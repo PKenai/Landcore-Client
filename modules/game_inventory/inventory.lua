@@ -134,6 +134,19 @@ function init()
   
   refresh()
   inventoryWindow:setup()
+
+  -- Apply shader to inventory panel background
+  scheduleEvent(function()
+    if inventoryPanel then
+      -- Apply background shader for visual effect
+      if inventoryPanel.setBackgroundShader then
+        inventoryPanel:setBackgroundShader("ui_blood")
+        if inventoryPanel.setBackgroundColor then
+          inventoryPanel:setBackgroundColor("#000000")
+        end
+      end
+    end
+  end, 100)
 end
 
 function terminate()

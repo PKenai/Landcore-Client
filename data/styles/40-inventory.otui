@@ -1,4 +1,5 @@
 InventoryItem < Item
+  background-image: /images/landcore/inventoryicon
   $on:
     image-source: /images/ui/item-blessed
 
