@@ -16,6 +16,9 @@ function init()
   -- outfit shaders
   g_shaders.createOutfitShader("outfit_default", "/shaders/outfit_default_vertex", "/shaders/outfit_default_fragment")
 
+  -- shadow shader
+  g_shaders.createOutfitShader("simple_soft_shadow", "/shaders/outfit_default_vertex", "/shaders/simple_soft_shadow_fragment")
+
   g_shaders.createOutfitShader("Shader #25", "/shaders/outfit_rainbow_vertex", "/shaders/outfit_rainbow_fragment")
   g_shaders.addTexture("Shader #25", "/images/shaders/rainbow.png")
 
