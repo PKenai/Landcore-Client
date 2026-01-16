@@ -1,0 +1,27 @@
+Panel
+  id: timerPanel
+  phantom: true
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.bottom: parent.bottom
+  margin-bottom: 60
+  width: 336
+  height: 78
+  visible: false
+
+  Panel
+    id: timerImage
+    image-source: /images/landcore/timerbackground.png
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 0
+    phantom: false
+
+  Label
+    id: timerLabel
+    anchors.centerIn: parent
+    color: #FFFFFF
+    font: sans-bold-18px
+    text-align: center
+    text-auto-resize: true
+    text: "00:00"

@@ -22,3 +22,4 @@ Module
     - client_stats
     - client_feedback
     - client_mobile
+    - game_timer

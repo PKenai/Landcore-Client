@@ -4,7 +4,6 @@ UIWindow
   size: 394 83
   anchors.bottom: parent.bottom
   anchors.horizontalCenter: parent.horizontalCenter
-  text: Item skills
   focusable: false
   phantom: true
   UIWidget

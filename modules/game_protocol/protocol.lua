@@ -32,7 +32,8 @@ local ServerPackets = {
 	Highscores = 0xB1,
 	Inspection = 0x76,
 	TeamFinderList = 0x2D,
-	TeamFinderLeader = 0x2C
+	TeamFinderLeader = 0x2C,
+	GameTimer = 0x2E
 }
 
 -- Server Types
@@ -50,9 +51,23 @@ local DAILY_REWARD_SYSTEM_TYPE_PREY_REROLL = 2
 local DAILY_REWARD_SYSTEM_TYPE_XP_BOOST = 3
 
 function init()
-  connect(g_game, { onEnterGame = registerProtocol,
-                    onPendingGame = registerProtocol,
-                    onGameEnd = unregisterProtocol })
+  -- WORKAROUND: Interceptar mensagens de texto que começam com TIMER_START
+  connect(g_game, {
+    onTextMessage = function(mode, text)
+      if text and text:find("^TIMER_START:") then
+        local seconds = tonumber(text:match("TIMER_START:(%d+)"))
+        if seconds and modules.game_timer then
+          modules.game_timer.startTimer(seconds)
+          -- Impede que a mensagem apareça no chat
+          return true
+        end
+      end
+      return false
+    end,
+    onEnterGame = registerProtocol,
+    onPendingGame = registerProtocol,
+    onGameEnd = unregisterProtocol
+  })
   if g_game.isOnline() then
     registerProtocol()
   end
@@ -98,6 +113,13 @@ function registerProtocol()
 		msg:getU16() -- Character level
 		msg:getU8() -- Vocation
 		msg:getU8() -- Member type (Leader == 3)
+	end
+  end)
+
+  registerOpcode(ServerPackets.GameTimer, function(protocol, msg)
+	local seconds = msg:getU32() -- Timer duration in seconds
+	if modules.game_timer then
+		modules.game_timer.startTimer(seconds)
 	end
   end)
 

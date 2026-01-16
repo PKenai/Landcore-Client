@@ -1,0 +1,9 @@
+Module
+  name: game_timer
+  description: Game Timer Module
+  author: Landcore Team
+  reloadable: true
+  sandboxed: true
+  scripts: [ timer ]
+  @onLoad: init()
+  @onUnload: terminate()
