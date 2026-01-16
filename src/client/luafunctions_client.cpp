@@ -913,6 +913,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("setDrawManaBar", &UIMap::setDrawManaBar);
     g_lua.bindClassMemberFunction<UIMap>("setDrawPlayerBars", &UIMap::setDrawPlayerBars);
     g_lua.bindClassMemberFunction<UIMap>("setDrawCreatureShadows", &UIMap::setDrawCreatureShadows);
+    g_lua.bindClassMemberFunction<UIMap>("setDrawSpeechBalloons", &UIMap::setDrawSpeechBalloons);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingCreatureShadows", &UIMap::isDrawingCreatureShadows);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingSpeechBalloons", &UIMap::isDrawingSpeechBalloons);
     g_lua.bindClassMemberFunction<UIMap>("setAnimated", &UIMap::setAnimated);
