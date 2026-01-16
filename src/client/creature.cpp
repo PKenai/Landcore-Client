@@ -109,6 +109,7 @@ void Creature::draw(const Point& dest, bool animate, LightView* lightView)
 
     // Verificar se deve desenhar sombras de criaturas
     bool shouldDrawShadows = true;
+    UIMap* mapWidget = getMapWidget();
     if (mapWidget) {
         shouldDrawShadows = mapWidget->isDrawingCreatureShadows();
     }
@@ -158,14 +159,19 @@ void Creature::drawOutfit(const Rect& destRect, Otc::Direction direction, const 
     m_outfit.draw(destRect, direction, 0, animate, ui, oldScaling);
 }
 
+UIMap* Creature::getMapWidget()
+{
+    UIWidgetPtr gameMapPanel = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
+    if (gameMapPanel) {
+        return dynamic_cast<UIMap*>(gameMapPanel.get());
+    }
+    return nullptr;
+}
+
 void Creature::drawInformation(const Point& point, bool useGray, const Rect& parentRect, int drawFlags)
 {
     // Get map widget for drawing options
-    UIMap* mapWidget = nullptr;
-    UIWidgetPtr gameMapPanel = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
-    if (gameMapPanel) {
-        mapWidget = dynamic_cast<UIMap*>(gameMapPanel.get());
-    }
+    UIMap* mapWidget = getMapWidget();
 
     if (!g_game.getFeature(Otc::GameOldInformationBar) && g_game.getClientVersion() >= 760) {
         if (m_healthPercent < 1)  // creature is dead, we get rid of its information bar

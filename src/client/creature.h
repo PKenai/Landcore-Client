@@ -180,6 +180,8 @@ public:
     bool isCreature() { return true; }
     bool canShoot(int distance);
 
+    UIMap* getMapWidget();
+
     const ThingTypePtr& getThingType();
     ThingType *rawGetThingType();
 
