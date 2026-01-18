@@ -800,15 +800,10 @@ void Creature::updateWalkAnimation(uint8 totalPixelsWalked)
         return;
 
     int footAnimPhases = getWalkAnimationPhases() - 1;
-    // TODO, should be /2 for <= 810
-    uint16 footDelay = getStepDuration(true);
-    if (footAnimPhases > 0) {
-        footDelay = ((getStepDuration(true) + 20) / (g_game.getFeature(Otc::GameFasterAnimations) ? footAnimPhases * 2 : footAnimPhases));
-    }
-    if (!g_game.getFeature(Otc::GameFasterAnimations))
-        footDelay += 10;
-    if (footDelay < 20)
-        footDelay = 20;
+    
+    // Fixed animation speed as requested (150ms)
+    // This decouples the animation from the movement speed/tile traversal time
+    uint16 footDelay = 150;
 
     // Since mount is a different outfit we need to get the mount animation phases
     if (m_outfit.getMount() != 0) {
@@ -816,25 +811,20 @@ void Creature::updateWalkAnimation(uint8 totalPixelsWalked)
         footAnimPhases = std::min<int>(footAnimPhases, type->getAnimationPhases() - 1);
     }
 
+    // Logic for continuous animation
+    // Removed the check "totalPixelsWalked < g_sprites.spriteSize()" to allow animation update at tile boundaries
     if (footAnimPhases == 0) {
         m_walkAnimationPhase = 0;
-    } else if (g_clock.millis() >= m_footLastStep + footDelay && totalPixelsWalked < g_sprites.spriteSize()) {
+    } else if (g_clock.millis() >= m_footLastStep + footDelay) {
         m_footStep++;
         m_walkAnimationPhase = 1 + (m_footStep % footAnimPhases);
         m_footLastStep = (g_clock.millis() - m_footLastStep) > footDelay * 1.5 ? g_clock.millis() : m_footLastStep + footDelay;
-    } else if (m_walkAnimationPhase == 0 && totalPixelsWalked < g_sprites.spriteSize()) {
+    } else if (m_walkAnimationPhase == 0) {
         m_walkAnimationPhase = 1 + (m_footStep % footAnimPhases);
     }
 
-    if (totalPixelsWalked == g_sprites.spriteSize() && !m_walkFinishAnimEvent) {
-        auto self = static_self_cast<Creature>();
-        m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
-            self->m_footStep = 0;
-            self->m_walkAnimationPhase = 0;
-            self->m_walkFinishAnimEvent = nullptr;
-        }, 50);
-    }
-
+    // Removed the block that forced animation reset at end of tile (lines 829-836)
+    // The animation will now only be reset when terminateWalk() is explicitly called (e.g. when stopping)
 }
 
 void Creature::updateWalkOffset(uint8 totalPixelsWalked, bool inNextFrame)
