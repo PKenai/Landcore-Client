@@ -313,9 +313,38 @@ function enableChat(temporarily)
     modules.client_options.setOption("wsadWalking", false)
   end
 
+  consolePanel:show()
   consoleTextEdit:setVisible(true)
   consoleTextEdit:setText("")
+  consoleTextEdit:setEditable(true)
+  consoleTextEdit:setFocusable(true)
+  
+  -- Handle Enter and Escape specifically for the grabbed state
+  consoleTextEdit.onKeyDown = function(self, keyCode, modifiers)
+    if keyCode == KeyEnter then
+      sendCurrentMessage()
+      return true
+    elseif keyCode == KeyEscape then
+      disableChat(temporarily)
+      return true
+    end
+    return false
+  end
+
+  -- Force focus and keyboard grab
   consoleTextEdit:focus()
+  consoleTextEdit:grabKeyboard()
+  
+  local focusFunc = function()
+    if consoleTextEdit:isVisible() then
+      consoleTextEdit:focus()
+      consoleTextEdit:setCursorPos(0)
+    end
+  end
+
+  -- Multiple attempts to ensure focus "sticks"
+  addEvent(focusFunc)
+  scheduleEvent(focusFunc, 100)
 
   local gameRootPanel = modules.game_interface.getRootPanel()
   g_keyboard.unbindKeyDown("Enter", gameRootPanel)
@@ -343,6 +372,10 @@ function disableChat(temporarily)
 
   consoleTextEdit:setVisible(false)
   consoleTextEdit:setText("")
+  consoleTextEdit:ungrabKeyboard()
+  
+  -- Clear widget-specific handlers
+  consoleTextEdit.onKeyDown = nil
 
   local quickFunc = function()
     if not g_game.isOnline() then return end
@@ -1098,13 +1131,27 @@ function processMessageMenu(mousePos, mouseButton, creatureName, text, label, ta
 end
 
 function sendCurrentMessage()
+  if not isChatEnabled() then
+    enableChat(true)
+    return
+  end
+  
   local message = consoleTextEdit:getText()
-  if #message == 0 then return end
-  if not isChatEnabled() then return end
+  if #message == 0 then
+    if modules.client_options.getOption('wsadWalking') then
+      disableChat(true)
+    end
+    return 
+  end
+  
   consoleTextEdit:clearText()
 
   -- send message
   sendMessage(message)
+  
+  if modules.client_options.getOption('wsadWalking') then
+    disableChat(true)
+  end
 end
 
 function onTextChange(self)

@@ -191,6 +191,7 @@ Panel
       anchors.fill: parent
       opacity: 0.3
       text-align: left
+      phantom: true
       text: "Enter your message here..."
 
   ConsoleButton
