@@ -549,6 +549,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("getPrewalkingPosition", &Creature::getPrewalkingPosition);
     g_lua.bindClassMemberFunction<Creature>("setInformationColor", &Creature::setInformationColor);
     g_lua.bindClassMemberFunction<Creature>("resetInformationColor", &Creature::resetInformationColor);
+    g_lua.bindClassMemberFunction<Creature>("setNameHighlight", &Creature::setNameHighlight);
+    g_lua.bindClassMemberFunction<Creature>("clearNameHighlight", &Creature::clearNameHighlight);
     g_lua.bindClassMemberFunction<Creature>("setInformationOffset", &Creature::setInformationOffset);
     g_lua.bindClassMemberFunction<Creature>("getInformationOffset", &Creature::getInformationOffset);
     g_lua.bindClassMemberFunction<Creature>("setText", &Creature::setText);

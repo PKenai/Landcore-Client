@@ -43,5 +43,6 @@ Module
     - game_unified_inventory
     - game_notifications
     - game_proficiency
+    - game_streamertag
   @onLoad: init()
   @onUnload: terminate()

@@ -103,6 +103,9 @@ public:
     void setInformationColor(const Color& color) { m_useCustomInformationColor = true; m_informationColor = color; }
     void resetInformationColor() { m_useCustomInformationColor = false; setHealthPercent(getHealthPercent());  }
 
+    void setNameHighlight(const Color& baseColor, const Color& highlightColor, float highlightPos, float highlightWidth = 2.0f);
+    void clearNameHighlight() { m_useNameHighlight = false; }
+
     Point getInformationOffset() { return m_informationOffset; }
     void setInformationOffset(int x, int y) { m_informationOffset = Point(x, y); }
 
@@ -268,6 +271,10 @@ protected:
     Color m_timedSquareColor;
     Color m_staticSquareColor;
     Color m_nameColor;
+    Color m_nameHighlightColor;
+    float m_nameHighlightPos;
+    float m_nameHighlightWidth;
+    bool m_useNameHighlight;
     stdext::boolean<false> m_showTimedSquare;
     stdext::boolean<false> m_showStaticSquare;
     stdext::boolean<true> m_removed;

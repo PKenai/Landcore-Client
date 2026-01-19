@@ -33,6 +33,7 @@ public:
     CachedText();
 
     void draw(const Rect& rect, const Color& color);
+    void drawWithHighlight(const Rect& rect, const Color& baseColor, const Color& highlightColor, float highlightPos, float highlightWidth = 2.0f);
 
     void wrapText(int maxWidth);
     void setFont(const BitmapFontPtr& font) { m_font = font; update(); }

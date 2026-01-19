@@ -33,7 +33,7 @@ CachedText::CachedText()
 
 void CachedText::draw(const Rect& rect, const Color& color)
 {
-    if(!m_font)
+    if(!m_font || m_text.empty())
         return;
 
     if(m_textMustRecache || m_textCachedScreenCoords != rect) {
@@ -42,10 +42,50 @@ void CachedText::draw(const Rect& rect, const Color& color)
     }
 
     if (m_textColors.empty()) {
-        m_font->drawText(m_text, m_textCachedScreenCoords, Fw::AlignCenter, color);
+        m_font->drawText(m_text, m_textCachedScreenCoords, m_align, color);
     } else {
-        m_font->drawColoredText(m_text, m_textCachedScreenCoords, Fw::AlignCenter, m_textColors);
+        m_font->drawColoredText(m_text, m_textCachedScreenCoords, m_align, m_textColors);
     }
+}
+
+void CachedText::drawWithHighlight(const Rect& rect, const Color& baseColor, const Color& highlightColor, float highlightPos, float highlightWidth)
+{
+    if (!m_font || m_text.empty())
+        return;
+
+    if(m_textMustRecache || m_textCachedScreenCoords != rect) {
+        m_textMustRecache = false;
+        m_textCachedScreenCoords = rect;
+    }
+
+    int textLen = static_cast<int>(m_text.length());
+
+    // Wrap highlight position
+    while (highlightPos < 0) highlightPos += textLen;
+    while (highlightPos >= textLen) highlightPos -= textLen;
+
+    std::vector<std::pair<int, Color>> textColors;
+    textColors.reserve(textLen);
+    
+    for (int i = 0; i < textLen; ++i) {
+        float dist = std::abs(static_cast<float>(i) - highlightPos);
+        float wrapDist = textLen - dist;
+        dist = std::min(dist, wrapDist);
+        
+        float t = 0.0f;
+        if (dist < highlightWidth) {
+            t = (std::cos(dist / highlightWidth * 3.14159f) + 1.0f) / 2.0f;
+        }
+        
+        uint8_t r = static_cast<uint8_t>(baseColor.r() + (highlightColor.r() - baseColor.r()) * t);
+        uint8_t g = static_cast<uint8_t>(baseColor.g() + (highlightColor.g() - baseColor.g()) * t);
+        uint8_t b = static_cast<uint8_t>(baseColor.b() + (highlightColor.b() - baseColor.b()) * t);
+        uint8_t a = static_cast<uint8_t>(baseColor.a() + (highlightColor.a() - baseColor.a()) * t);
+        
+        textColors.emplace_back(i + 1, Color(r, g, b, a));
+    }
+
+    m_font->drawColoredText(m_text, m_textCachedScreenCoords, m_align, textColors);
 }
 
 void CachedText::setColoredText(const std::vector<std::string>& texts)

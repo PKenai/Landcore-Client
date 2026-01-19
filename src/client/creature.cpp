@@ -76,6 +76,9 @@ Creature::Creature() : Thing()
     m_outfitColor = Color::white;
     m_progressBarPercent = 0;
     m_progressBarUpdateEvent = nullptr;
+    m_useNameHighlight = false;
+    m_nameHighlightPos = 0.0f;
+    m_nameHighlightWidth = 2.0f;
     g_stats.addCreature();
 }
 
@@ -157,6 +160,15 @@ void Creature::drawOutfit(const Rect& destRect, Otc::Direction direction, const 
         direction = m_direction;
 
     m_outfit.draw(destRect, direction, 0, animate, ui, oldScaling);
+}
+
+void Creature::setNameHighlight(const Color& baseColor, const Color& highlightColor, float highlightPos, float highlightWidth)
+{
+    m_nameColor = baseColor;
+    m_nameHighlightColor = highlightColor;
+    m_nameHighlightPos = highlightPos;
+    m_nameHighlightWidth = highlightWidth;
+    m_useNameHighlight = true;
 }
 
 UIMap* Creature::getMapWidget()
@@ -432,13 +444,56 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
                 // Desenha o resto do nome começando no pixel 17
                 int restX = startX + 17;
                 Rect restRect = Rect(restX, startY, restSize);
-                font->drawText(restOfName, restRect, Fw::AlignTopLeft, fillColor);
+                if (m_useNameHighlight) {
+                    // Calculate highlight colors for each character
+                    int textLen = (int)m_name.length();
+                    std::vector<std::pair<int, Color>> colors;
+                    for (int i = 0; i < textLen; ++i) {
+                        float dist = std::abs((float)i - m_nameHighlightPos);
+                        float wrapDist = (float)textLen - dist;
+                        dist = std::min(dist, wrapDist);
+                        
+                        float t = 0.0f;
+                        if (dist < m_nameHighlightWidth) {
+                            t = (std::cos(dist / m_nameHighlightWidth * 3.14159f) + 1.0f) / 2.0f;
+                        }
+
+                        Color color = Color(
+                            (uint8)(m_nameColor.r() * (1.0f - t) + m_nameHighlightColor.r() * t),
+                            (uint8)(m_nameColor.g() * (1.0f - t) + m_nameHighlightColor.g() * t),
+                            (uint8)(m_nameColor.b() * (1.0f - t) + m_nameHighlightColor.b() * t)
+                        );
+                        colors.push_back(std::make_pair(i, color));
+                    }
+
+                    // First letter (index 0 in full name, index 1 for 1-based drawing)
+                    std::vector<std::pair<int, Color>> firstCharColor = { { 1, colors[0].second } };
+                    font->drawColoredText(firstLetter, firstLetterRect, Fw::AlignTopLeft, firstCharColor);
+
+                    // Rest of the name (index i in full name, index i relative to restOfName for 1-based drawing)
+                    std::vector<std::pair<int, Color>> restCharsColors;
+                    for (size_t i = 1; i < colors.size(); ++i) {
+                        restCharsColors.push_back(std::make_pair((int)i, colors[i].second));
+                    }
+                    font->drawColoredText(restOfName, restRect, Fw::AlignTopLeft, restCharsColors);
+                } else {
+                    font->drawText(firstLetter, firstLetterRect, Fw::AlignTopLeft, fillColor);
+                    font->drawText(restOfName, restRect, Fw::AlignTopLeft, fillColor);
+                }
             } else {
-                m_nameCache.draw(textRect, fillColor);
+                if (m_useNameHighlight) {
+                    m_nameCache.drawWithHighlight(textRect, m_nameColor, m_nameHighlightColor, m_nameHighlightPos, m_nameHighlightWidth);
+                } else {
+                    m_nameCache.draw(textRect, fillColor);
+                }
             }
         } else {
             // Para criaturas ou nomes com 1 letra, desenha normal
-            m_nameCache.draw(textRect, fillColor);
+            if (m_useNameHighlight) {
+                m_nameCache.drawWithHighlight(textRect, m_nameColor, m_nameHighlightColor, m_nameHighlightPos, m_nameHighlightWidth);
+            } else {
+                m_nameCache.draw(textRect, fillColor);
+            }
         }
 
         // Draw monster icon at the end of the name

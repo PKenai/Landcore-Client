@@ -1,0 +1,9 @@
+Module
+  name: game_streamertag
+  description: Adds animated highlight effects and streamer tags to specific players
+  author: Antigravity
+  website: https://github.com/edubart/otclient
+  sandboxed: true
+  scripts: [ streamertag ]
+  @onLoad: init()
+  @onUnload: terminate()
