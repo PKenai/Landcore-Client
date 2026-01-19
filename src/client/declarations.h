@@ -53,6 +53,7 @@ class Town;
 class CreatureType;
 class Spawn;
 class TileBlock;
+class Beam;
 
 typedef stdext::shared_object_ptr<MapView> MapViewPtr;
 typedef stdext::shared_object_ptr<LightView> LightViewPtr;
@@ -76,6 +77,7 @@ typedef stdext::shared_object_ptr<House> HousePtr;
 typedef stdext::shared_object_ptr<Town> TownPtr;
 typedef stdext::shared_object_ptr<CreatureType> CreatureTypePtr;
 typedef stdext::shared_object_ptr<Spawn> SpawnPtr;
+typedef stdext::shared_object_ptr<Beam> BeamPtr;
 
 typedef std::vector<ThingPtr> ThingList;
 typedef std::vector<ThingTypePtr> ThingTypeList;
@@ -86,8 +88,10 @@ typedef std::list<ItemPtr> ItemList;
 typedef std::list<TilePtr> TileList;
 typedef std::vector<ItemPtr> ItemVector;
 typedef std::unordered_map<Position, TilePtr, PositionHasher> TileMap;
-typedef std::unordered_map<Position, CreatureTypePtr, PositionHasher> CreatureMap;
+typedef std::unordered_map<Position, CreatureTypePtr, PositionHasher>
+    CreatureMap;
 typedef std::unordered_map<Position, SpawnPtr, PositionHasher> SpawnMap;
+typedef std::list<BeamPtr> BeamList;
 
 // net
 class ProtocolLogin;

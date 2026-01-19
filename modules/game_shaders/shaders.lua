@@ -51,6 +51,9 @@ function init()
   g_shaders.createOutfitShader("Shader #22", "/shaders/outfit_rainbow_vertex", "/shaders/green_ozeus")
   g_shaders.createOutfitShader("Shader #23", "/shaders/outfit_rainbow_vertex", "/shaders/red_ozeus")
   g_shaders.createOutfitShader("Shader #24", "/shaders/outfit_rainbow_vertex", "/shaders/white_ozeus")
+
+  -- beam shader
+  g_shaders.createShader("beam_shader", "/shaders/beam_vertex", "/shaders/beam_fragment")
 end
 
 function terminate()

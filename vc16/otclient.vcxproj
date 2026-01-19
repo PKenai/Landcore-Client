@@ -327,6 +327,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_lib|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\src\client\beam.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='OpenGL|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_lib|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\src\client\client.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='OpenGL|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_lib|Win32'">true</ExcludedFromBuild>
@@ -969,6 +974,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\client\animatedtext.h" />
     <ClInclude Include="..\src\client\animator.h" />
+    <ClInclude Include="..\src\client\beam.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />
     <ClInclude Include="..\src\client\container.h" />

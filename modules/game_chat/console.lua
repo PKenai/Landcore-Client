@@ -1184,6 +1184,100 @@ function sendMessage(message, tab)
   local tab = tab or getCurrentTab()
   if not tab then return end
 
+  -- Support both /testbeam and /testebeam, case insensitive
+  local beamCommand = message:match("^/[Tt]est[e]?beam%s+(.+)") or 
+                      message:match("^[Tt]est[e]?beam%s+\"([^\"]+)\"") or
+                      message:match("^[Tt]est[e]?beam%s+(.+)")
+
+  if beamCommand then
+    g_logger.info("Beam command detected with parameter: " .. beamCommand)
+    
+    if not Beam or not Beam.create then
+       g_logger.error("CRITICAL: Beam class is NOT registered in Lua! Did you rebuild the client?")
+       return false
+    end
+
+    local targetName = beamCommand:trim()
+    if targetName:sub(1,1) == "\"" then targetName = targetName:sub(2) end
+    if targetName:sub(-1,-1) == "\"" then targetName = targetName:sub(1, -2) end
+    
+    local target = g_map.getCreatureByName(targetName)
+    if not target then
+       g_logger.info("Target '" .. targetName .. "' not found by name, searching spectators...")
+       local localPlayer = g_game.getLocalPlayer()
+       if localPlayer then
+         for _, creature in ipairs(g_map.getSpectators(localPlayer:getPosition(), false)) do
+           if creature:getName():lower() == targetName:lower() then
+             target = creature
+             break
+           end
+         end
+       end
+    end
+
+    if target then
+      g_logger.info("Beam target found: " .. target:getName() .. " (ID: " .. target:getId() .. ")")
+      local player = g_game.getLocalPlayer()
+      local beam = Beam.create()
+      beam:setSourceCreature(player)
+      beam:setTargetCreature(target)
+      beam:setThickness(30.0) 
+      beam:setColor("#FF0000") -- RED
+      beam:setShader("beam_shader")
+      beam:setDuration(10000) 
+      g_map.addBeam(beam)
+      g_logger.info("Beam added to map")
+      addText("Beam casted on " .. target:getName() .. "!", SpeakTypesSettings.say, tab:getText())
+    else
+      g_logger.info("Beam target not found: " .. targetName)
+      addText("Creature " .. targetName .. " not found.", SpeakTypesSettings.say, tab:getText())
+    end
+    return true
+  end
+
+  -- Shortcut for testingbeam on self or target
+  if message:match("^/[Tt]est[e]?beam$") then
+     g_logger.info("Short Beam command detected (self/target)")
+     if not Beam or not Beam.create then
+        g_logger.error("CRITICAL: Beam class is NOT registered in Lua!")
+        return false
+     end
+
+     local player = g_game.getLocalPlayer()
+     local target = g_game.getAttackingCreature()
+     
+     -- If no attacking target, try to find any nearby creature
+     if not target and player then
+        local spectators = g_map.getSpectators(player:getPosition(), false)
+        for _, creature in ipairs(spectators) do
+          if creature ~= player then
+            target = creature
+            break
+          end
+        end
+     end
+
+     -- Fallback to player
+     target = target or player
+
+     if target == player then
+        g_logger.info("Test beam fired at SELF (length will be 0.0). Target someone else for a line!")
+     else
+        g_logger.info("Test beam fired at " .. target:getName())
+     end
+
+     local beam = Beam.create()
+     beam:setSourceCreature(player)
+     beam:setTargetCreature(target)
+     beam:setThickness(30.0)
+     beam:setColor("#FF0000")
+     beam:setShader("beam_shader")
+     beam:setDuration(10000)
+     g_map.addBeam(beam)
+     g_logger.info("Test beam fired at " .. target:getName())
+     return true
+  end
+
   for k,func in pairs(filters) do
     if func(message) then
       return true
