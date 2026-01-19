@@ -1,0 +1,9 @@
+Module
+  name: game_proficiency
+  description: Handles equipment proficiency display
+  author: Antigravity
+  website: https://github.com/edubart/otclient
+  sandboxed: true
+  scripts: [ proficiency ]
+  @onLoad: init()
+  @onTerminate: terminate()

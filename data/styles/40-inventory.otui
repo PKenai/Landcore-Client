@@ -3,6 +3,29 @@ InventoryItem < Item
   $on:
     image-source: /images/ui/item-blessed
 
+  Label
+    id: proficiencyLevel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 1
+    margin-left: 2
+    font: cipsoftFont
+    color: #FFFFFF
+    text: 
+    phantom: true
+
+  ProgressBar
+    id: proficiencyBar
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 2
+    width: 15
+    height: 3
+    background-color: #00ff00
+    border: 1 #000000
+    phantom: true
+    visible: false
+
 HeadSlot < InventoryItem
   id: slot1
   image-source: /images/game/slots/head
