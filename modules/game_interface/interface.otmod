@@ -44,5 +44,6 @@ Module
     - game_notifications
     - game_proficiency
     - game_streamertag
+    - game_beam
   @onLoad: init()
   @onUnload: terminate()

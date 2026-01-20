@@ -181,6 +181,8 @@ void Client::registerLuaFunctions() {
                               &Map::removeThingColor, &g_map);
   g_lua.bindSingletonFunction("g_map", "addBeam", &Map::addBeam, &g_map);
   g_lua.bindSingletonFunction("g_map", "removeBeam", &Map::removeBeam, &g_map);
+  g_lua.bindSingletonFunction("g_map", "removeBeamsBySource",
+                              &Map::removeBeamsBySource, &g_map);
   g_lua.bindSingletonFunction("g_map", "getBeams", &Map::getBeams, &g_map);
   g_lua.bindSingletonFunction("g_map", "clean", &Map::clean, &g_map);
   g_lua.bindSingletonFunction("g_map", "cleanTile", &Map::cleanTile, &g_map);
@@ -1545,6 +1547,8 @@ void Client::registerLuaFunctions() {
   g_lua.bindClassMemberFunction<Beam>("setTargetPos", &Beam::setTargetPos);
   g_lua.bindClassMemberFunction<Beam>("setThickness", &Beam::setThickness);
   g_lua.bindClassMemberFunction<Beam>("setColor", &Beam::setColor);
+  g_lua.bindClassMemberFunction<Beam>("setParticleColor",
+                                      &Beam::setParticleColor);
   g_lua.bindClassMemberFunction<Beam>("setShader", &Beam::setShader);
   g_lua.bindClassMemberFunction<Beam>("setDuration", &Beam::setDuration);
   g_lua.bindClassMemberFunction<Beam>("getSourceCreature",
@@ -1555,10 +1559,15 @@ void Client::registerLuaFunctions() {
   g_lua.bindClassMemberFunction<Beam>("getTargetPos", &Beam::getTargetPos);
   g_lua.bindClassMemberFunction<Beam>("getThickness", &Beam::getThickness);
   g_lua.bindClassMemberFunction<Beam>("getColor", &Beam::getColor);
+  g_lua.bindClassMemberFunction<Beam>("getParticleColor",
+                                      &Beam::getParticleColor);
   g_lua.bindClassMemberFunction<Beam>("getShader", &Beam::getShader);
 
   g_lua.bindGlobalFunction("addBeam",
                            [](const BeamPtr &beam) { g_map.addBeam(beam); });
+  g_lua.bindGlobalFunction(
+      "removeBeamsBySource",
+      [](const CreaturePtr &source) { g_map.removeBeamsBySource(source); });
   g_lua.bindGlobalFunction("removeBeam",
                            [](const BeamPtr &beam) { g_map.removeBeam(beam); });
   g_lua.bindGlobalFunction("getBeams", [] { return g_map.getBeams(); });

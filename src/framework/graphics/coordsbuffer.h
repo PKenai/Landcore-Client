@@ -24,86 +24,114 @@
 #define COORDSBUFFER_H
 
 #include "vertexarray.h"
+#include <framework/util/point.h>
+#include <framework/util/rect.h>
 
-class CoordsBuffer
-{
+class CoordsBuffer {
 public:
-    CoordsBuffer();
-    ~CoordsBuffer();
-    CoordsBuffer(CoordsBuffer& c) = delete;
-    CoordsBuffer& operator=(CoordsBuffer& c) = delete;
-    CoordsBuffer(CoordsBuffer&& c) noexcept : m_vertexArray(c.m_vertexArray), m_textureCoordArray(c.m_textureCoordArray)
-    {
-        m_locked = c.m_locked = true;
-    };
+  CoordsBuffer();
+  ~CoordsBuffer();
+  CoordsBuffer(CoordsBuffer &c) = delete;
+  CoordsBuffer &operator=(CoordsBuffer &c) = delete;
+  CoordsBuffer(CoordsBuffer &&c) noexcept
+      : m_vertexArray(c.m_vertexArray),
+        m_textureCoordArray(c.m_textureCoordArray) {
+    m_locked = c.m_locked = true;
+  };
 
-    void clear() {
-        if (m_locked)
-            unlock(true);
-        m_textureCoordArray->clear();
-        m_vertexArray->clear();
-    }
+  void clear() {
+    if (m_locked)
+      unlock(true);
+    m_textureCoordArray->clear();
+    m_vertexArray->clear();
+  }
 
-    void addTriangle(const Point& a, const Point& b, const Point& c) {
-        if (m_locked)
-            unlock();
-        m_vertexArray->addTriangle(a, b, c);
-    }
-    void addRect(const Rect& dest) {
-        if (m_locked)
-            unlock();
-        m_vertexArray->addRect(dest);
-    }
-    void addRect(const Rect& dest, const Rect& src)
-    {
-        if (m_locked)
-            unlock();
-        m_vertexArray->addRect(dest);
-        m_textureCoordArray->addRect(src);
-    }
-    void addRect(const RectF& dest, const RectF& src)
-    {
-        if (m_locked)
-            unlock();
-        m_vertexArray->addRect(dest);
-        m_textureCoordArray->addRect(src);
-    }
-    void addQuad(const Rect& dest, const Rect& src) {
-        if (m_locked)
-            unlock();
-        m_vertexArray->addQuad(dest);
-        m_textureCoordArray->addQuad(src);
-    }
-    void addUpsideDownQuad(const Rect& dest, const Rect& src) {
-        if (m_locked)
-            unlock();
-        m_vertexArray->addUpsideDownQuad(dest);
-        m_textureCoordArray->addQuad(src);
-    }
+  void addTriangle(const Point &a, const Point &b, const Point &c) {
+    if (m_locked)
+      unlock();
+    m_vertexArray->addTriangle(a, b, c);
+  }
+  void addRect(const Rect &dest) {
+    if (m_locked)
+      unlock();
+    m_vertexArray->addRect(dest);
+  }
+  void addRect(const Rect &dest, const Rect &src) {
+    if (m_locked)
+      unlock();
+    m_vertexArray->addRect(dest);
+    m_textureCoordArray->addRect(src);
+  }
+  void addRect(const RectF &dest, const RectF &src) {
+    if (m_locked)
+      unlock();
+    m_vertexArray->addRect(dest);
+    m_textureCoordArray->addRect(src);
+  }
+  void addQuad(const Rect &dest, const Rect &src) {
+    if (m_locked)
+      unlock();
+    m_vertexArray->addQuad(dest);
+    m_textureCoordArray->addQuad(src);
+  }
+  void addUpsideDownQuad(const Rect &dest, const Rect &src) {
+    if (m_locked)
+      unlock();
+    m_vertexArray->addUpsideDownQuad(dest);
+    m_textureCoordArray->addQuad(src);
+  }
 
-    void addBoudingRect(const Rect& dest, int innerLineWidth);
-    void addRepeatedRects(const Rect& dest, const Rect& src);
+  // Custom Quad with arbitrary vertices (TL, TR, BR, BL order)
+  void addCustomQuad(const PointF &p1, const PointF &p2, const PointF &p3,
+                     const PointF &p4, const RectF &tex) {
+    if (m_locked)
+      unlock();
 
-    float *getVertexArray() { return m_vertexArray->vertices(); }
-    float *getTextureCoordArray() { return m_textureCoordArray->vertices(); }
-    int getVertexCount() { return m_vertexArray->vertexCount(); }
-    int getTextureCoordCount() { return m_textureCoordArray->vertexCount(); }
-    HardwareBuffer* getVertexHardwareCache() { return m_vertexArray->getHardwareCache(); }
-    HardwareBuffer* getTextureHardwareCache() { return m_textureCoordArray->getHardwareCache(); }
+    float tL = tex.left(), tT = tex.top(), tR = tex.right(), tB = tex.bottom();
 
-    void unlock(bool clear = false);
-    void cache()
-    {
-        m_locked = true;
-        m_vertexArray->cache();
-        m_textureCoordArray->cache();
-    }
-    Rect getTextureRect();
+    // Triangle 1: p1(TL), p2(TR), p4(BL)
+    m_vertexArray->addVertex(p1.x, p1.y);
+    m_textureCoordArray->addVertex(tL, tT);
+    m_vertexArray->addVertex(p2.x, p2.y);
+    m_textureCoordArray->addVertex(tR, tT);
+    m_vertexArray->addVertex(p4.x, p4.y);
+    m_textureCoordArray->addVertex(tL, tB);
+
+    // Triangle 2: p4(BL), p2(TR), p3(BR)
+    m_vertexArray->addVertex(p4.x, p4.y);
+    m_textureCoordArray->addVertex(tL, tB);
+    m_vertexArray->addVertex(p2.x, p2.y);
+    m_textureCoordArray->addVertex(tR, tT);
+    m_vertexArray->addVertex(p3.x, p3.y);
+    m_textureCoordArray->addVertex(tR, tB);
+  }
+
+  void addBoudingRect(const Rect &dest, int innerLineWidth);
+  void addRepeatedRects(const Rect &dest, const Rect &src);
+
+  float *getVertexArray() { return m_vertexArray->vertices(); }
+  float *getTextureCoordArray() { return m_textureCoordArray->vertices(); }
+  int getVertexCount() { return m_vertexArray->vertexCount(); }
+  int getTextureCoordCount() { return m_textureCoordArray->vertexCount(); }
+  HardwareBuffer *getVertexHardwareCache() {
+    return m_vertexArray->getHardwareCache();
+  }
+  HardwareBuffer *getTextureHardwareCache() {
+    return m_textureCoordArray->getHardwareCache();
+  }
+
+  void unlock(bool clear = false);
+  void cache() {
+    m_locked = true;
+    m_vertexArray->cache();
+    m_textureCoordArray->cache();
+  }
+  Rect getTextureRect();
 
 private:
-    bool m_locked = false;
-    std::shared_ptr<VertexArray> m_vertexArray;
-    std::shared_ptr<VertexArray> m_textureCoordArray;
+  bool m_locked = false;
+  std::shared_ptr<VertexArray> m_vertexArray;
+  std::shared_ptr<VertexArray> m_textureCoordArray;
 };
 
 #endif

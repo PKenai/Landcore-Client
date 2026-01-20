@@ -210,6 +210,7 @@ public:
 
   void addBeam(const BeamPtr &beam);
   void removeBeam(const BeamPtr &beam);
+  void removeBeamsBySource(const CreaturePtr &source);
   const BeamList &getBeams() { return m_beams; }
 
   StaticTextPtr getStaticText(const Position &pos);

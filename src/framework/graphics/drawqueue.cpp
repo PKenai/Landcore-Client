@@ -200,19 +200,203 @@ void DrawQueueItemBeam::draw() {
   PointF direction = PointF(m_end.x - m_start.x, m_end.y - m_start.y);
   float length = direction.length();
 
-  // VALIDATION: Reject absurd coordinates (sometimes happen when target is
-  // lost)
+  // VALIDATION: Reject absurd coordinates
   if (length > 10000.0f || length < 0.1f) {
     return;
   }
 
-  // Use simple drawLine for now to confirm visibility with thickness
-  g_painter->saveState();
-  g_painter->setColor(Color::red);
+  // Use a 1x1 white texture for solid color quads
+  static TexturePtr whiteTexture = nullptr;
+  if (!whiteTexture) {
+    ImagePtr whiteImage = ImagePtr(new Image(Size(1, 1), 4));
+    whiteImage->setPixel(0, 0, Color::white);
+    whiteTexture = TexturePtr(new Texture(whiteImage));
+  }
 
-  std::vector<float> vertices = {(float)m_start.x, (float)m_start.y,
-                                 (float)m_end.x, (float)m_end.y};
-  g_painter->drawLine(vertices, 2, m_thickness);
+  g_painter->saveState();
+  g_painter->setTexture(whiteTexture);
+
+  // Calculate normalized direction and perpendicular
+  float invLen = 1.0f / length;
+  PointF dir = direction * invLen;
+  PointF perp(-dir.y, dir.x);
+  // Laser parameters
+  float coreWidth = m_thickness * 0.3f; // 30% for white core
+  float auraWidth = m_thickness;        // 100% for outer glow
+
+  // Cap size (rounded ends) - use half thickness minus 5px for closer fit
+  float capSize = m_thickness * 0.5f - 5.0f;
+
+  // Shorten beam body to leave space for caps
+  PointF startF((float)m_start.x, (float)m_start.y);
+  PointF endF((float)m_end.x, (float)m_end.y);
+  PointF bodyStart = startF + dir * capSize;
+  PointF bodyEnd = endF - dir * capSize;
+  float bodyLength = length - (capSize * 2.0f);
+
+  // Segment length (small for smooth appearance)
+  float segmentLength = 6.0f;
+  int numSegments = std::max(1, (int)(bodyLength / segmentLength));
+  float actualSegLen = bodyLength / numSegments;
+
+  // Draw all segments (BODY only, caps drawn separately)
+  for (int i = 0; i < numSegments; ++i) {
+    float t = (float)i / numSegments;
+    PointF segCenter = bodyStart + dir * (t * bodyLength);
+
+    float halfSegLen = actualSegLen * 0.5f;
+
+    // ANIMATION: Traveling intensity wave
+    float wave = std::sin(m_time * 6.0f - t * 12.0f);
+    float intensity = 0.7f + wave * 0.3f;
+
+    // ANIMATION: Subtle width pulsation
+    float widthPulse = 1.0f + std::sin(m_time * 4.0f + t * 10.0f) * 0.08f;
+
+    // EDGE FADE: Soften beam start/end for polished look
+    float edgeFade = std::min((t < 0.1f) ? (t / 0.1f) : 1.0f,
+                              (t > 0.9f) ? ((1.0f - t) / 0.1f) : 1.0f);
+    intensity *= edgeFade;
+
+    // --- AURA LAYER (Multi-layer for soft glow) ---
+    const int auraLayers = 5;
+    for (int layer = 0; layer < auraLayers; ++layer) {
+      float layerT = (float)layer / (auraLayers - 1);
+
+      // Shrink width as we go inward
+      float layerWidth = (auraWidth * widthPulse) * (1.0f - layerT * 0.6f);
+      float halfWidth = layerWidth * 0.5f;
+
+      // Quadratic alpha falloff for strong fade
+      float layerAlpha = 1.0f - layerT;
+      layerAlpha *= layerAlpha;
+
+      PointF p1 = segCenter - perp * halfWidth - dir * halfSegLen;
+      PointF p2 = segCenter + perp * halfWidth - dir * halfSegLen;
+      PointF p3 = segCenter + perp * halfWidth + dir * halfSegLen;
+      PointF p4 = segCenter - perp * halfWidth + dir * halfSegLen;
+
+      Color auraColor = m_color;
+      auraColor.setAlpha((int)(64 * intensity * layerAlpha));
+
+      g_painter->setColor(auraColor);
+      CoordsBuffer coordsBuffer;
+      coordsBuffer.addCustomQuad(p1, p2, p3, p4, RectF(0, 0, 1, 1));
+      g_painter->drawTextureCoords(coordsBuffer, whiteTexture);
+    }
+
+    // --- CORE LAYER (Multi-layer for soft glow) ---
+    const int coreLayers = 5;
+    for (int layer = 0; layer < coreLayers; ++layer) {
+      float layerT = (float)layer / (coreLayers - 1);
+
+      // Shrink width as we go inward
+      float layerWidth = (coreWidth * widthPulse) * (1.0f - layerT * 0.6f);
+      float halfWidth = layerWidth * 0.5f;
+
+      // Quadratic alpha falloff
+      float layerAlpha = 1.0f - layerT;
+      layerAlpha *= layerAlpha;
+
+      PointF p1 = segCenter - perp * halfWidth - dir * halfSegLen;
+      PointF p2 = segCenter + perp * halfWidth - dir * halfSegLen;
+      PointF p3 = segCenter + perp * halfWidth + dir * halfSegLen;
+      PointF p4 = segCenter - perp * halfWidth + dir * halfSegLen;
+
+      Color coreColor = Color::white;
+      coreColor.setAlpha((int)(230 * intensity * layerAlpha)); // 0.9 * 255
+
+      g_painter->setColor(coreColor);
+      CoordsBuffer coordsBuffer;
+      coordsBuffer.addCustomQuad(p1, p2, p3, p4, RectF(0, 0, 1, 1));
+      g_painter->drawTextureCoords(coordsBuffer, whiteTexture);
+    }
+  }
+
+  // --- ROUNDED CAPS (True Half-Circles) ---
+  // Helper lambda to draw half-circle using triangle fan
+  auto drawHalfCircle = [&](const PointF &center, const PointF &forward,
+                            float radius, const Color &color, bool invert) {
+    const int segments = 16;
+    const float PI = 3.14159265359f;
+
+    PointF dir = forward;
+    float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+    if (len > 0.0001f) {
+      dir.x /= len;
+      dir.y /= len;
+    }
+
+    PointF right(-dir.y, dir.x);
+
+    g_painter->setColor(color);
+
+    // Draw triangle fan: sweep from -90° to +90° perpendicular to dir
+    for (int i = 0; i < segments; ++i) {
+      float t1 = (float)i / segments;
+      float t2 = (float)(i + 1) / segments;
+
+      // Angle from -PI/2 to +PI/2 (perpendicular sweep)
+      float angle1 = (t1 - 0.5f) * PI;
+      float angle2 = (t2 - 0.5f) * PI;
+
+      // Points on the arc: rotate around the perpendicular direction
+      PointF p1 = center + dir * (std::cos(angle1) * radius) +
+                  right * (std::sin(angle1) * radius);
+      PointF p2 = center + dir * (std::cos(angle2) * radius) +
+                  right * (std::sin(angle2) * radius);
+
+      // Triangle: center, p1, p2 (draw as degenerate quad)
+      CoordsBuffer coordsBuffer;
+      coordsBuffer.addCustomQuad(center, p1, p2, p2, RectF(0, 0, 1, 1));
+      g_painter->drawTextureCoords(coordsBuffer, whiteTexture);
+    }
+  };
+
+  // Draw START cap (facing backward) - aura then core
+  drawHalfCircle(bodyStart, dir * -1.0f, auraWidth * 0.5f,
+                 Color((uint8)m_color.r(), (uint8)m_color.g(),
+                       (uint8)m_color.b(), (uint8)64),
+                 true);
+  drawHalfCircle(bodyStart, dir * -1.0f, coreWidth * 0.5f,
+                 Color((uint8)255, (uint8)255, (uint8)255, (uint8)230), true);
+
+  // Draw END cap (facing forward) - aura then core
+  drawHalfCircle(bodyEnd, dir, auraWidth * 0.5f,
+                 Color((uint8)m_color.r(), (uint8)m_color.g(),
+                       (uint8)m_color.b(), (uint8)64),
+                 false);
+  drawHalfCircle(bodyEnd, dir, coreWidth * 0.5f,
+                 Color((uint8)255, (uint8)255, (uint8)255, (uint8)230), false);
+
+  // --- PARTICLES (After beam, so they appear to "escape") ---
+  for (const auto &particle : m_particles) {
+    // Calculate particle position
+    PointF basePos = startF + dir * (particle.t * length);
+    PointF particlePos = basePos + perp * particle.offset;
+
+    // Fade based on remaining life
+    float alpha = particle.life / particle.maxLife;
+
+    // Small circle (radius ~1.5px)
+    float radius = 1.5f;
+
+    // Golden/white color matching beam aura
+    Color particleColor = m_particleColor;
+    particleColor.setAlpha((int)(128 * alpha)); // 50% max opacity, fading
+
+    g_painter->setColor(particleColor);
+
+    // Draw as small quad (approximating circle)
+    PointF p1 = particlePos + PointF(-radius, -radius);
+    PointF p2 = particlePos + PointF(radius, -radius);
+    PointF p3 = particlePos + PointF(radius, radius);
+    PointF p4 = particlePos + PointF(-radius, radius);
+
+    CoordsBuffer coordsBuffer;
+    coordsBuffer.addCustomQuad(p1, p2, p3, p4, RectF(0, 0, 1, 1));
+    g_painter->drawTextureCoords(coordsBuffer, whiteTexture);
+  }
 
   g_painter->restoreSavedState();
 }
@@ -429,9 +613,7 @@ void DrawQueue::draw(DrawType drawType) {
             dynamic_cast<DrawQueueItemBeam *>(m_queue[i])) {
       static float lastPrint = 0;
       if (g_clock.seconds() - lastPrint > 2.0f) {
-        g_logger.info(
-            stdext::format("DrawQueue: Found beam item at index %d", (int)i));
-        lastPrint = g_clock.seconds();
+        // No log here anymore
       }
     }
     while (!activeConditions.empty() && activeConditions.top()->m_end <= i) {
@@ -448,8 +630,8 @@ void DrawQueue::draw(DrawType drawType) {
 
     if (!m_queue[i]->cache()) {
       g_drawCache.draw();
-      if (!m_queue[i]->cache()) { // try to cache again, now g_drawCache should
-                                  // be empty, maybe there's new space
+      if (!m_queue[i]->cache()) { // try to cache again, now g_drawCache
+                                  // should be empty, maybe there's new space
         m_queue[i]->draw();
       }
     }

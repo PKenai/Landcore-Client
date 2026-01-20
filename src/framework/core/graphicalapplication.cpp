@@ -269,7 +269,6 @@ void GraphicalApplication::run() {
       toDrawMapQueue->draw(DRAW_ALL);
       static float lastPrint = 0;
       if (g_clock.seconds() - lastPrint > 2.0f) {
-        g_logger.info("GraphicalApp: Flushed MapBackground queue.");
         lastPrint = g_clock.seconds();
       }
       m_mapFramebuffer->release();

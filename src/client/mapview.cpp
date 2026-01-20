@@ -235,8 +235,6 @@ void MapView::drawFloor(short floor, const Position &cameraPosition,
   if (!g_map.getBeams().empty()) {
     static float lastPrint = 0;
     if (g_clock.seconds() - lastPrint > 2.0f) {
-      g_logger.info(stdext::format("MapView: Floor %d, active beams: %d", floor,
-                                   (int)g_map.getBeams().size()));
       lastPrint = g_clock.seconds();
     }
   }
@@ -269,8 +267,13 @@ void MapView::drawFloor(short floor, const Position &cameraPosition,
     fromPoint += Point(g_sprites.spriteSize() / 2, g_sprites.spriteSize() / 2);
     toPoint += Point(g_sprites.spriteSize() / 2, g_sprites.spriteSize() / 2);
 
+    // Update beam animation (assuming ~16ms per frame at 60 FPS)
+    beam->update(0.016f);
+
     g_drawQueue->addBeam(fromPoint, toPoint, beam->getThickness(),
-                         beam->getColor(), beam->getShader());
+                         beam->getColor(), beam->getParticleColor(),
+                         beam->getShader(), beam->getTime(),
+                         beam->getParticles());
   }
 }
 

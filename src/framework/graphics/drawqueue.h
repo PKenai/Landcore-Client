@@ -13,6 +13,15 @@
 class DrawQueue;
 struct DrawQueueItem;
 
+// Forward declaration for beam particles
+struct BeamParticle {
+  float t;
+  float offset;
+  float speed;
+  float life;
+  float maxLife;
+};
+
 enum DrawType : uint8_t {
   DRAW_ALL = 0,
   DRAW_BEFORE_MAP = 1,
@@ -159,9 +168,12 @@ struct DrawQueueItemLine : public DrawQueueItem {
 
 struct DrawQueueItemBeam : public DrawQueueItem {
   DrawQueueItemBeam(const Point &start, const Point &end, float thickness,
-                    const Color &color, const std::string &shader)
+                    const Color &color, const Color &particleColor,
+                    const std::string &shader, float time,
+                    const std::vector<BeamParticle> &particles)
       : DrawQueueItem(nullptr, color), m_start(start), m_end(end),
-        m_thickness(thickness), m_shader(shader) {};
+        m_thickness(thickness), m_particleColor(particleColor),
+        m_shader(shader), m_time(time), m_particles(particles) {};
 
   void draw() override;
   bool cache() override { return false; }
@@ -169,7 +181,10 @@ struct DrawQueueItemBeam : public DrawQueueItem {
   Point m_start;
   Point m_end;
   float m_thickness;
+  Color m_particleColor;
   std::string m_shader;
+  float m_time;
+  std::vector<BeamParticle> m_particles;
 };
 
 struct DrawQueueCondition {
@@ -312,9 +327,11 @@ public:
   }
 
   void addBeam(const Point &start, const Point &end, float thickness,
-               const Color &color, const std::string &shader) {
-    m_queue.push_back(
-        new DrawQueueItemBeam(start, end, thickness, color, shader));
+               const Color &color, const Color &particleColor,
+               const std::string &shader, float time,
+               const std::vector<BeamParticle> &particles) {
+    m_queue.push_back(new DrawQueueItemBeam(
+        start, end, thickness, color, particleColor, shader, time, particles));
   }
 
   void setFrameBuffer(const Rect &dest, const Size &size, const Rect &src);

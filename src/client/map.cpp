@@ -1420,6 +1420,19 @@ void Map::removeBeam(const BeamPtr &beam) {
     m_beams.erase(it);
 }
 
+void Map::removeBeamsBySource(const CreaturePtr &source) {
+  if (!source)
+    return;
+
+  for (auto it = m_beams.begin(); it != m_beams.end();) {
+    if ((*it)->getSourceCreature() == source) {
+      it = m_beams.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
 void Map::cleanTexts() {
   m_animatedTexts.clear();
   m_staticTexts.clear();

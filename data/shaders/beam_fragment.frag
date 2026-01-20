@@ -1,45 +1,52 @@
-
+// Laser Beam Shader (Static, No Noise)
 uniform float u_Time;
-uniform vec4 u_Color;
+uniform vec4 u_Color; // Base color (e.g., Red or Purple)
 varying vec2 v_TexCoord;
 
-// Perlin Noise functions (simplified)
-vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
-vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
-
-float cnoise(vec2 P){
-  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
-  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
-  Pi = mod(Pi, 289.0);
-  vec4 ix = Pi.xzxz;
-  vec4 iy = Pi.yyww;
-  vec4 fx = Pf.xzxz;
-  vec4 fy = Pf.yyww;
-  vec4 i = permute(permute(ix) + iy);
-  vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0;
-  vec4 gy = abs(gx) - 0.5;
-  vec4 tx = floor(gx + 0.5);
-  gx = gx - tx;
-  vec2 g00 = vec2(gx.x,gy.x);
-  vec2 g10 = vec2(gx.y,gy.y);
-  vec2 g01 = vec2(gx.z,gy.z);
-  vec2 g11 = vec2(gx.w,gy.w);
-  vec4 norm = 1.79284291400159 - 0.85373472095314 * vec4(dot(g00, g00), dot(g10, g10), dot(g01, g01), dot(g11, g11));
-  g00 *= norm.x; g10 *= norm.y; g01 *= norm.z; g11 *= norm.w;
-  float n00 = dot(g00, vec2(fx.x, fy.x));
-  float n10 = dot(g10, vec2(fx.y, fy.y));
-  float n01 = dot(g01, vec2(fx.z, fy.z));
-  float n11 = dot(g11, vec2(fx.w, fy.w));
-  vec2 fade_xy = fade(Pf.xy);
-  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-  float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-  return 2.3 * n_xy;
-}
-
 void main() {
-    vec4 color = u_Color;
-    float distFromCenter = abs(v_TexCoord.y - 0.5) * 2.0;
-    float core = 1.0 - smoothstep(0.0, 1.0, distFromCenter);
-    float pulse = 0.7 + 0.3 * sin(u_Time * 5.0);
-    gl_FragColor = vec4(color.rgb, color.a * core * pulse);
+    // x: length, y: thickness (0..1)
+    // Map y to range -1.0 to 1.0 (0 at center)
+    float y = (v_TexCoord.y - 0.5) * 2.0;
+    float dist = abs(y);
+
+    // --- LASER PROFILE ---
+    
+    // 1. Core (Bright White Center)
+    // Sharp falloff near 0. Width approx 30% of total thickness.
+    float coreWidth = 0.3;
+    float coreMask = smoothstep(coreWidth, 0.0, dist);
+    
+    // 2. Aura (Translucent Glow)
+    // Soft falloff from center to edge.
+    // Starts fading immediately, reaches 0 at edge (1.0).
+    float auraMask = smoothstep(1.0, 0.2, dist);
+    
+    // --- COMPOSITION ---
+    
+    // Aura Color: Use the uniform color (e.g. from Lua).
+    // If u_Color is weak, boost it slightly.
+    vec3 auraColorRGB = u_Color.rgb * 1.5; 
+    
+    // Core Color: Pure White.
+    vec3 coreColorRGB = vec3(1.0, 1.0, 1.0);
+    
+    // Mix Core on top of Aura
+    // If coreMask is high, show White. Else show Aura Color.
+    vec3 finalColor = mix(auraColorRGB, coreColorRGB, coreMask);
+    
+    // Alpha Logic
+    // Combined opacity of Core + Aura.
+    // Core is solid (1.0). Aura is translucent (e.g. 0.5 max).
+    // We want the edge to fade to 0.
+    
+    float auraAlpha = 0.6 * auraMask; // Max aura opacity 0.6
+    float coreAlpha = 1.0 * coreMask; // Core is opaque
+    
+    // Combine alphas (Core overrides Aura)
+    float finalAlpha = max(coreAlpha, auraAlpha);
+    
+    // Hard clamp at edge to prevent bleeding if smoothstep allows it
+    finalAlpha *= smoothstep(1.0, 0.8, dist);
+
+    gl_FragColor = vec4(finalColor, finalAlpha);
 }

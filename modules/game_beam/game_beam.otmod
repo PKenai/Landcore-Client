@@ -1,0 +1,10 @@
+Module
+  name: game_beam
+  description: Handles server-side beam effects via Extended Opcodes
+  author: Landcore
+  website: www.landcore.com
+  sandboxed: true
+  auto-load: true
+  scripts: [ beam_net ]
+  @onLoad: init()
+  @onUnload: terminate()
