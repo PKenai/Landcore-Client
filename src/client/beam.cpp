@@ -4,7 +4,7 @@
 #include <framework/core/clock.h>
 
 Beam::Beam()
-    : m_thickness(10.0f), m_color(Color::white),
+    : m_thickness(10.0f), m_color(Color::white), m_coreColor(Color::white),
       m_particleColor(255, 230, 153), // Default golden
       m_shader("beam_shader"), m_endTime(0), m_time(0.0f) {}
 

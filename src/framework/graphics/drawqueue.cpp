@@ -303,8 +303,9 @@ void DrawQueueItemBeam::draw() {
       PointF p3 = segCenter + perp * halfWidth + dir * halfSegLen;
       PointF p4 = segCenter - perp * halfWidth + dir * halfSegLen;
 
-      Color coreColor = Color::white;
-      coreColor.setAlpha((int)(230 * intensity * layerAlpha)); // 0.9 * 255
+      Color coreColor = m_color * 2.0f; // Brighten the beam color for the core
+                                        // (maintaining black if color is black)
+      coreColor.setAlpha((int)(230 * intensity * layerAlpha));
 
       g_painter->setColor(coreColor);
       CoordsBuffer coordsBuffer;
@@ -353,21 +354,22 @@ void DrawQueueItemBeam::draw() {
     }
   };
 
+  Color capCoreColor = m_coreColor;
+  capCoreColor.setAlpha(230);
+
   // Draw START cap (facing backward) - aura then core
   drawHalfCircle(bodyStart, dir * -1.0f, auraWidth * 0.5f,
                  Color((uint8)m_color.r(), (uint8)m_color.g(),
                        (uint8)m_color.b(), (uint8)64),
                  true);
-  drawHalfCircle(bodyStart, dir * -1.0f, coreWidth * 0.5f,
-                 Color((uint8)255, (uint8)255, (uint8)255, (uint8)230), true);
+  drawHalfCircle(bodyStart, dir * -1.0f, coreWidth * 0.5f, capCoreColor, true);
 
   // Draw END cap (facing forward) - aura then core
   drawHalfCircle(bodyEnd, dir, auraWidth * 0.5f,
                  Color((uint8)m_color.r(), (uint8)m_color.g(),
                        (uint8)m_color.b(), (uint8)64),
                  false);
-  drawHalfCircle(bodyEnd, dir, coreWidth * 0.5f,
-                 Color((uint8)255, (uint8)255, (uint8)255, (uint8)230), false);
+  drawHalfCircle(bodyEnd, dir, coreWidth * 0.5f, capCoreColor, false);
 
   // --- PARTICLES (After beam, so they appear to "escape") ---
   for (const auto &particle : m_particles) {

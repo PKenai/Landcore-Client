@@ -271,9 +271,9 @@ void MapView::drawFloor(short floor, const Position &cameraPosition,
     beam->update(0.016f);
 
     g_drawQueue->addBeam(fromPoint, toPoint, beam->getThickness(),
-                         beam->getColor(), beam->getParticleColor(),
-                         beam->getShader(), beam->getTime(),
-                         beam->getParticles());
+                         beam->getColor(), beam->getCoreColor(),
+                         beam->getParticleColor(), beam->getShader(),
+                         beam->getTime(), beam->getParticles());
   }
 }
 

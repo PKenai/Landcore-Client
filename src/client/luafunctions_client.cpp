@@ -1547,6 +1547,7 @@ void Client::registerLuaFunctions() {
   g_lua.bindClassMemberFunction<Beam>("setTargetPos", &Beam::setTargetPos);
   g_lua.bindClassMemberFunction<Beam>("setThickness", &Beam::setThickness);
   g_lua.bindClassMemberFunction<Beam>("setColor", &Beam::setColor);
+  g_lua.bindClassMemberFunction<Beam>("setCoreColor", &Beam::setCoreColor);
   g_lua.bindClassMemberFunction<Beam>("setParticleColor",
                                       &Beam::setParticleColor);
   g_lua.bindClassMemberFunction<Beam>("setShader", &Beam::setShader);
@@ -1559,6 +1560,7 @@ void Client::registerLuaFunctions() {
   g_lua.bindClassMemberFunction<Beam>("getTargetPos", &Beam::getTargetPos);
   g_lua.bindClassMemberFunction<Beam>("getThickness", &Beam::getThickness);
   g_lua.bindClassMemberFunction<Beam>("getColor", &Beam::getColor);
+  g_lua.bindClassMemberFunction<Beam>("getCoreColor", &Beam::getCoreColor);
   g_lua.bindClassMemberFunction<Beam>("getParticleColor",
                                       &Beam::getParticleColor);
   g_lua.bindClassMemberFunction<Beam>("getShader", &Beam::getShader);

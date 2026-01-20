@@ -35,6 +35,7 @@ public:
 
   void setThickness(float thickness) { m_thickness = thickness; }
   void setColor(const Color &color) { m_color = color; }
+  void setCoreColor(const Color &color) { m_coreColor = color; }
   void setParticleColor(const Color &color) { m_particleColor = color; }
   void setShader(const std::string &shader) { m_shader = shader; }
   void setDuration(int duration);
@@ -47,6 +48,7 @@ public:
 
   float getThickness() { return m_thickness; }
   Color getColor() { return m_color; }
+  Color getCoreColor() { return m_coreColor; }
   Color getParticleColor() { return m_particleColor; }
   std::string getShader() { return m_shader; }
   float getTime() { return m_time; }
@@ -68,6 +70,7 @@ private:
   Position m_targetPos;
   float m_thickness;
   Color m_color;
+  Color m_coreColor;
   Color m_particleColor;
   std::string m_shader;
   ticks_t m_endTime;

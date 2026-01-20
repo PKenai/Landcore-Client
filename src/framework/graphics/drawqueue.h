@@ -168,12 +168,13 @@ struct DrawQueueItemLine : public DrawQueueItem {
 
 struct DrawQueueItemBeam : public DrawQueueItem {
   DrawQueueItemBeam(const Point &start, const Point &end, float thickness,
-                    const Color &color, const Color &particleColor,
-                    const std::string &shader, float time,
-                    const std::vector<BeamParticle> &particles)
+                    const Color &color, const Color &coreColor,
+                    const Color &particleColor, const std::string &shader,
+                    float time, const std::vector<BeamParticle> &particles)
       : DrawQueueItem(nullptr, color), m_start(start), m_end(end),
-        m_thickness(thickness), m_particleColor(particleColor),
-        m_shader(shader), m_time(time), m_particles(particles) {};
+        m_thickness(thickness), m_coreColor(coreColor),
+        m_particleColor(particleColor), m_shader(shader), m_time(time),
+        m_particles(particles) {};
 
   void draw() override;
   bool cache() override { return false; }
@@ -181,6 +182,7 @@ struct DrawQueueItemBeam : public DrawQueueItem {
   Point m_start;
   Point m_end;
   float m_thickness;
+  Color m_coreColor;
   Color m_particleColor;
   std::string m_shader;
   float m_time;
@@ -327,11 +329,12 @@ public:
   }
 
   void addBeam(const Point &start, const Point &end, float thickness,
-               const Color &color, const Color &particleColor,
-               const std::string &shader, float time,
-               const std::vector<BeamParticle> &particles) {
-    m_queue.push_back(new DrawQueueItemBeam(
-        start, end, thickness, color, particleColor, shader, time, particles));
+               const Color &color, const Color &coreColor,
+               const Color &particleColor, const std::string &shader,
+               float time, const std::vector<BeamParticle> &particles) {
+    m_queue.push_back(new DrawQueueItemBeam(start, end, thickness, color,
+                                            coreColor, particleColor, shader,
+                                            time, particles));
   }
 
   void setFrameBuffer(const Rect &dest, const Size &size, const Rect &src);

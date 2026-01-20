@@ -30,6 +30,17 @@ function onBeamOpcode(protocol, opcode, buffer)
     
     if data.color then 
       beam:setColor(data.color) 
+      -- Default core color to 2.0x brightness if not explicitly provided
+      -- This matches our previous dynamic fix as a default behavior
+      if not data.coreColor then
+        local c = data.color
+        local cc = {r = math.min(255, c.r * 2), g = math.min(255, c.g * 2), b = math.min(255, c.b * 2), a = c.a}
+        if beam.setCoreColor then beam:setCoreColor(cc) end
+      end
+    end
+    
+    if data.coreColor then
+      if beam.setCoreColor then beam:setCoreColor(data.coreColor) end
     end
     
     if data.particleColor then 
