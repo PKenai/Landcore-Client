@@ -1,8 +1,21 @@
+local DISPLAY_DRAGGED_ITEM_COUNT = true
+
 function UIItem:onDragEnter(mousePos)
   if self:isVirtual() then return false end
 
   local item = self:getItem()
   if not item then return false end
+
+  self.dragItemWidget = g_ui.createWidget('DraggedItemWidget', modules.game_interface.getRootPanel())
+  self.dragItemWidget:setItemId(item:getId())
+  self.dragItemWidget:setItemCount(item:getCount())
+  self.dragItemWidget:setShowCount(false)
+
+  if item:getCount() > 1 and DISPLAY_DRAGGED_ITEM_COUNT then
+    self.dragItemWidget.count:setText(item:getCount())
+  end
+
+  self:updateDragItemWidgetPosition(mousePos)
 
   self:setBorderWidth(1)
   self.currentDragThing = item
@@ -10,8 +23,26 @@ function UIItem:onDragEnter(mousePos)
   return true
 end
 
+function UIItem:updateDragItemWidgetPosition(mousePos)
+  local x = mousePos.x + 10
+  local y = mousePos.y + 10
+  self.dragItemWidget:move(x, y)
+end
+
+function UIItem:onMouseMove(mousePos, mouseMoved)
+  if self.dragItemWidget then
+    self:updateDragItemWidgetPosition(mousePos)
+  end
+end
+
 function UIItem:onDragLeave(droppedWidget, mousePos)
   if self:isVirtual() then return false end
+
+  if self.dragItemWidget then
+    self.dragItemWidget:destroy()
+    self.dragItemWidget = nil
+  end
+  
   self.currentDragThing = nil
   g_mouse.popCursor('target')
   self:setBorderWidth(0)
@@ -49,6 +80,10 @@ function UIItem:onDrop(widget, mousePos, forced)
 end
 
 function UIItem:onDestroy()
+  if self.dragItemWidget then
+    self.dragItemWidget:destroy()
+    self.dragItemWidget = nil
+  end
   if self == g_ui.getDraggingWidget() and self.hoveredWho then
     self.hoveredWho:setBorderWidth(0)
   end
@@ -65,6 +100,9 @@ function UIItem:onHoverChange(hovered)
 
   local draggingWidget = g_ui.getDraggingWidget()
   if draggingWidget and self ~= draggingWidget then
+    local item = draggingWidget.currentDragThing
+    if not item or not item:isItem() then return end
+
     local gotMap = draggingWidget:getClassName() == 'UIGameMap'
     local gotItem = draggingWidget:getClassName() == 'UIItem' and not draggingWidget:isVirtual()
     if hovered and (gotItem or gotMap) then

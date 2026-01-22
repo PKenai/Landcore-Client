@@ -1,3 +1,5 @@
+local DISPLAY_DRAGGED_ITEM_COUNT = true
+
 UIGameMap = extends(UIMap, "UIGameMap")
 
 function UIGameMap.create()
@@ -14,6 +16,10 @@ end
 function UIGameMap:onDestroy()
   if self.updateMarkedCreatureEvent then
     removeEvent(self.updateMarkedCreatureEvent)
+  end
+  if self.dragItemWidget then
+    self.dragItemWidget:destroy()
+    self.dragItemWidget = nil
   end
 end
 
@@ -40,12 +46,36 @@ function UIGameMap:onDragEnter(mousePos)
 
   self.currentDragThing = thing
 
+  if thing:isItem() and not thing:isNotMoveable() then
+    self.dragItemWidget = g_ui.createWidget('DraggedItemWidget', modules.game_interface.getRootPanel())
+    self.dragItemWidget:setItemId(thing:getId())
+    self.dragItemWidget:setItemCount(thing:getCount())
+    self.dragItemWidget:setShowCount(false)
+
+    if thing:getCount() > 1 and DISPLAY_DRAGGED_ITEM_COUNT then
+      self.dragItemWidget.count:setText(thing:getCount())
+    end
+    self:updateDragItemWidgetPosition(mousePos)
+  end
+
   g_mouse.pushCursor('target')
   self.allowNextRelease = false
   return true
 end
 
+function UIGameMap:updateDragItemWidgetPosition(mousePos)
+  local x = mousePos.x + 10
+  local y = mousePos.y + 10
+  self.dragItemWidget:move(x, y)
+end
+
 function UIGameMap:onDragLeave(droppedWidget, mousePos)
+
+  if self.dragItemWidget then
+    self.dragItemWidget:destroy()
+    self.dragItemWidget = nil
+  end
+
   self.currentDragThing = nil
   self.hoveredWho = nil
   g_mouse.popCursor('target')
@@ -74,6 +104,11 @@ function UIGameMap:onDrop(widget, mousePos)
 end
 
 function UIGameMap:onMouseMove(mousePos, mouseMoved)
+
+  if self.dragItemWidget then
+    self:updateDragItemWidgetPosition(mousePos)
+  end
+
   self.mousePos = mousePos
   return false
 end

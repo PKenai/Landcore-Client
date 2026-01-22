@@ -8,3 +8,15 @@ Item < UIItem
 
   $disabled:
     color: #646464
+
+
+DraggedItemWidget < UIItem
+  size: 32 32
+  phantom: true
+  Label
+    id: count
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    color: white
+    font: verdana-11px-rounded
+    shadow: true
